@@ -49,3 +49,11 @@ func (this Datastore) Create(p Persistable) error {
 	p.SetKey(key)
 	return nil
 }
+
+func (this Datastore) Delete(p Persistable) error {
+	if err := ResolveKey(this.Context, p); err != nil {
+		return err
+	}
+
+	return datastore.Delete(this.Context, p.Key())
+}

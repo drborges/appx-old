@@ -230,5 +230,24 @@ func TestLoadModel(t *testing.T) {
 				})
 			})
 		})
+
+		Convey("Delete", func() {
+			Convey("Given I have a model saved in datastore", func() {
+				tag := Tag{Name: "golang", Owner: "Borges"}
+
+				Convey("When I delete it", func() {
+					err := ds.Datastore{c}.Delete(&tag)
+
+					Convey("Then it succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("Then the model does not exist in datastore", func() {
+						err = datastore.Get(c, tag.Key(), nil)
+						So(err, ShouldNotBeNil)
+					})
+				})
+			})
+		})
 	})
 }
