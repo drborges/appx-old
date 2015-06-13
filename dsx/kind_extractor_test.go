@@ -1,11 +1,11 @@
 package dsx_test
 
 import (
+	"github.com/drborges/ds"
+	"github.com/drborges/ds/dsx"
 	. "github.com/smartystreets/goconvey/convey"
 	"reflect"
 	"testing"
-	"github.com/drborges/ds/dsx"
-	"github.com/drborges/ds"
 )
 
 func TestKindExtractor(t *testing.T) {
@@ -15,9 +15,9 @@ func TestKindExtractor(t *testing.T) {
 
 		Convey(`Given I have a model tagged with db:"KindName"`, func() {
 			type CreditCard struct {
-				ds.Model      `ds:"CreditCards"`
-				Owner  string
-				Number int
+				ds.Model `ds:"CreditCards"`
+				Owner    string
+				Number   int
 			}
 
 			card := &CreditCard{Owner: "Borges"}
@@ -66,4 +66,3 @@ func TestKindExtractor(t *testing.T) {
 		})
 	})
 }
-

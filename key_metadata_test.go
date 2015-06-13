@@ -2,10 +2,10 @@ package ds_test
 
 import (
 	"appengine/aetest"
+	"appengine/datastore"
 	"github.com/drborges/ds"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"appengine/datastore"
 )
 
 func TestKeyMetadata(t *testing.T) {

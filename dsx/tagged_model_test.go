@@ -2,9 +2,9 @@ package dsx_test
 
 import (
 	"github.com/drborges/ds"
+	"github.com/drborges/ds/dsx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"github.com/drborges/ds/dsx"
 )
 
 func TestTaggedModel(t *testing.T) {
@@ -14,9 +14,9 @@ func TestTaggedModel(t *testing.T) {
 
 		Convey(`Given I have a model tagged with ds:"KindName"`, func() {
 			type User struct {
-				ds.Model       `ds:"Users"`
-				Name    string
-				Twitter string
+				ds.Model `ds:"Users"`
+				Name     string
+				Twitter  string
 			}
 
 			user := User{Name: "Diego", Twitter: "@drborges"}

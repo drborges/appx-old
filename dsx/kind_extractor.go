@@ -1,9 +1,9 @@
 package dsx
 
 import (
+	"github.com/drborges/ds"
 	"reflect"
 	"strings"
-	"github.com/drborges/ds"
 )
 
 type KindExtractor struct {

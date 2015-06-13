@@ -1,11 +1,11 @@
 package dsx_test
 
 import (
+	"github.com/drborges/ds"
+	"github.com/drborges/ds/dsx"
 	. "github.com/smartystreets/goconvey/convey"
 	"reflect"
 	"testing"
-	"github.com/drborges/ds/dsx"
-	"github.com/drborges/ds"
 )
 
 func TestStringIDExtractor(t *testing.T) {
@@ -76,4 +76,3 @@ func TestStringIDExtractor(t *testing.T) {
 		})
 	})
 }
-

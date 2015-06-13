@@ -6,9 +6,9 @@ import (
 )
 
 type KeyMetadata struct {
-	Kind      string
-	IntID     int64
-	StringID  string
+	Kind     string
+	IntID    int64
+	StringID string
 }
 
 func NewKey(c appengine.Context, p Persistable) *datastore.Key {
@@ -29,4 +29,3 @@ func ResolveKey(c appengine.Context, p Persistable) error {
 	p.SetKey(key)
 	return nil
 }
-

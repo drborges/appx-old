@@ -1,8 +1,8 @@
 package dsx
 
 import (
-	"reflect"
 	"github.com/drborges/ds"
+	"reflect"
 )
 
 type MetadataExtractor interface {
