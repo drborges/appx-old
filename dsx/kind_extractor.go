@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"strings"
 	"github.com/drborges/ds"
-	"fmt"
 )
 
 type KindExtractor struct {
@@ -18,8 +17,6 @@ func (this KindExtractor) Accept(f reflect.StructField) bool {
 func (this KindExtractor) Extract(e ds.Entity, f reflect.StructField, v reflect.Value) error {
 	elem := reflect.TypeOf(e).Elem()
 	this.Metadata.Kind = elem.Name()
-
-	fmt.Printf("########### %v", f)
 
 	kindMetadata := f.Tag.Get("ds")
 	values := strings.Split(kindMetadata, ",")

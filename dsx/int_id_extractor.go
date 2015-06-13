@@ -29,7 +29,7 @@ func (this IntIDExtractor) Accept(f reflect.StructField) bool {
 func (this IntIDExtractor) Extract(e ds.Entity, f reflect.StructField, v reflect.Value) error {
 	value := v.Int()
 	if value == 0 {
-		return ErrMissingIntId
+		return ErrMissingIntID
 	}
 	this.Metadata.IntID = value
 	return nil

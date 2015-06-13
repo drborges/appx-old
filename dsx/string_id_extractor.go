@@ -16,7 +16,7 @@ func (this StringIDExtractor) Accept(f reflect.StructField) bool {
 func (this StringIDExtractor) Extract(e ds.Entity, f reflect.StructField, v reflect.Value) error {
 	value := v.String()
 	if value == "" {
-		return ErrMissingStringId
+		return ErrMissingStringID
 	}
 	this.Metadata.StringID = value
 	return nil
