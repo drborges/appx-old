@@ -2,10 +2,14 @@ package ds
 
 import "appengine/datastore"
 
-type Persistable interface {
-	KeyMetadata() *KeyMetadata
+type Entity interface {
 	Key() *datastore.Key
 	SetKey(*datastore.Key)
+}
+
+type Persistable interface {
+	Entity
+	KeyMetadata() *KeyMetadata
 }
 
 type CacheableModel interface {

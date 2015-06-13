@@ -3,6 +3,7 @@ package ds
 import (
 	"appengine"
 	"appengine/datastore"
+	"reflect"
 )
 
 type KeyMetadata struct {
@@ -12,6 +13,12 @@ type KeyMetadata struct {
 	ParentKey *KeyMetadata
 }
 
+type MetadataExtractor interface {
+	Accept(reflect.StructField) bool
+	Extract(Entity, reflect.StructField, reflect.Value) error
+}
+
+// TODO test parent key resolution scenarios
 func NewKey(c appengine.Context, metadata *KeyMetadata) (*datastore.Key, error) {
 	var parentKey *datastore.Key
 	var err error
