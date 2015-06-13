@@ -1,14 +1,15 @@
-package ds
+package dsx
 
 import (
 	"reflect"
+	"github.com/drborges/ds"
 )
 
-type IntIdExtractor struct {
-	Metadata *KeyMetadata
+type IntIDExtractor struct {
+	Metadata *ds.KeyMetadata
 }
 
-func (this IntIdExtractor) Accept(f reflect.StructField) bool {
+func (this IntIDExtractor) Accept(f reflect.StructField) bool {
 	if f.Tag.Get("ds") == "" {
 		return false
 	}
@@ -25,7 +26,7 @@ func (this IntIdExtractor) Accept(f reflect.StructField) bool {
 	}
 }
 
-func (this IntIdExtractor) Extract(e Entity, f reflect.StructField, v reflect.Value) error {
+func (this IntIDExtractor) Extract(e ds.Entity, f reflect.StructField, v reflect.Value) error {
 	value := v.Int()
 	if value == 0 {
 		return ErrMissingIntId

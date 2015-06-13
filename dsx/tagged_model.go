@@ -1,11 +1,13 @@
-package ds
+package dsx
+
+import "github.com/drborges/ds"
 
 type TaggedModel struct {
-	Entity
+	ds.Entity
 }
 
-func (this TaggedModel) KeyMetadata() *KeyMetadata {
-	metadata := &KeyMetadata{}
+func (this TaggedModel) KeyMetadata() *ds.KeyMetadata {
+	metadata := &ds.KeyMetadata{}
 	// TODO handle extraction errors (defer, recover, panic?)
 	NewTaggedModelExtractorsChain(metadata).ExtractFrom(this.Entity)
 	return metadata

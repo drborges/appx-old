@@ -1,19 +1,25 @@
-package ds
+package dsx
 
 import (
 	"reflect"
+	"github.com/drborges/ds"
 )
+
+type MetadataExtractor interface {
+	Accept(reflect.StructField) bool
+	Extract(ds.Entity, reflect.StructField, reflect.Value) error
+}
 
 type TaggedModelExtractorsChain []MetadataExtractor
 
-func NewTaggedModelExtractorsChain(metadata *KeyMetadata) TaggedModelExtractorsChain {
+func NewTaggedModelExtractorsChain(metadata *ds.KeyMetadata) TaggedModelExtractorsChain {
 	return TaggedModelExtractorsChain{
-		IntIdExtractor{metadata},
-		StringIdExtractor{metadata},
+		IntIDExtractor{metadata},
+		StringIDExtractor{metadata},
 	}
 }
 
-func (this TaggedModelExtractorsChain) ExtractFrom(e Entity) error {
+func (this TaggedModelExtractorsChain) ExtractFrom(e ds.Entity) error {
 	elemType := reflect.TypeOf(e).Elem()
 	elemValue := reflect.ValueOf(e).Elem()
 

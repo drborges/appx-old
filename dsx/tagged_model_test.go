@@ -1,9 +1,10 @@
-package ds_test
+package dsx_test
 
 import (
 	"github.com/drborges/ds"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+	"github.com/drborges/ds/dsx"
 )
 
 func TestTaggedModel(t *testing.T) {
@@ -18,7 +19,7 @@ func TestTaggedModel(t *testing.T) {
 			user := User{Name: "Diego", Twitter: "@drborges"}
 
 			Convey("When I wrap it with TaggedModel", func() {
-				taggedUser := ds.TaggedModel{&user}
+				taggedUser := dsx.TaggedModel{&user}
 
 				Convey("Then KeyMetadata extracts string id from the tagged field", func() {
 					metadata := taggedUser.KeyMetadata()
@@ -37,7 +38,7 @@ func TestTaggedModel(t *testing.T) {
 			account := Account{Name: "Diego", Id: 123}
 
 			Convey("When I wrap it with TaggedModel", func() {
-				taggedAccount := ds.TaggedModel{&account}
+				taggedAccount := dsx.TaggedModel{&account}
 
 				Convey("Then KeyMetadata extracts string id from the tagged field", func() {
 					metadata := taggedAccount.KeyMetadata()
