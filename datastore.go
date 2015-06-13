@@ -33,14 +33,7 @@ func (this Datastore) Update(p Persistable) error {
 }
 
 func (this Datastore) Create(p Persistable) error {
-	var key *datastore.Key
-	var err error
-
-	if key, err = NewKey(this.Context, p.KeyMetadata()); err != nil {
-		return err
-	}
-
-	key, err = datastore.Put(this.Context, key, p)
+	key, err := datastore.Put(this.Context, NewKey(this.Context, p), p)
 
 	if err != nil {
 		return err

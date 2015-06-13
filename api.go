@@ -5,6 +5,8 @@ import "appengine/datastore"
 type Entity interface {
 	Key() *datastore.Key
 	SetKey(*datastore.Key)
+	ParentKey() *datastore.Key
+	SetParentKey(*datastore.Key)
 }
 
 type Persistable interface {

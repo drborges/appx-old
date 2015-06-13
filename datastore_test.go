@@ -60,9 +60,9 @@ func TestLoadModel(t *testing.T) {
 	Convey("ds.Datastore", t, func() {
 		Convey("Load", func() {
 			Convey("Given I have a model with StringID key saved in datastore", func() {
-				tag := Tag{Name: "golang", Owner: "Borges"}
-				key, _ := ds.NewKey(c, tag.KeyMetadata())
-				datastore.Put(c, key, &tag)
+				tag := &Tag{Name: "golang", Owner: "Borges"}
+				key := ds.NewKey(c, tag)
+				datastore.Put(c, key, tag)
 				tag.SetKey(key)
 
 				Convey("When I load it using ds.Datastore", func() {
@@ -74,7 +74,7 @@ func TestLoadModel(t *testing.T) {
 					})
 
 					Convey("Then the data is loaded from datastore", func() {
-						So(loadedTag, ShouldResemble, tag)
+						So(&loadedTag, ShouldResemble, tag)
 					})
 
 					Convey("Then the model has its key resolved", func() {
@@ -84,9 +84,9 @@ func TestLoadModel(t *testing.T) {
 			})
 
 			Convey("Given I have a model with IntID key saved in datastore", func() {
-				account := Account{Id: 123, Name: "Borges"}
-				key, _ := ds.NewKey(c, account.KeyMetadata())
-				datastore.Put(c, key, &account)
+				account := &Account{Id: 123, Name: "Borges"}
+				key := ds.NewKey(c, account)
+				datastore.Put(c, key, account)
 				account.SetKey(key)
 
 				Convey("When I load it using ds.Datastore", func() {
@@ -98,7 +98,7 @@ func TestLoadModel(t *testing.T) {
 					})
 
 					Convey("Then the data is loaded from datastore", func() {
-						So(loadedAccount, ShouldResemble, account)
+						So(&loadedAccount, ShouldResemble, account)
 					})
 
 					Convey("Then the model has its key resolved", func() {
@@ -108,9 +108,9 @@ func TestLoadModel(t *testing.T) {
 			})
 
 			Convey("Given I have a model with auto generated key saved in datastore", func() {
-				post := Post{Description: "This is gonna be awesome!"}
-				incompleteKey, _ := ds.NewKey(c, post.KeyMetadata())
-				key, _ := datastore.Put(c, incompleteKey, &post)
+				post := &Post{Description: "This is gonna be awesome!"}
+				incompleteKey := ds.NewKey(c, post)
+				key, _ := datastore.Put(c, incompleteKey, post)
 				post.SetKey(key)
 
 				Convey("When I load it with a key using ds.Datastore", func() {
@@ -123,7 +123,7 @@ func TestLoadModel(t *testing.T) {
 					})
 
 					Convey("Then the data is loaded from datastore", func() {
-						So(loadedPost, ShouldResemble, post)
+						So(&loadedPost, ShouldResemble, post)
 					})
 
 					Convey("Then the model has its key resolved", func() {
