@@ -8,6 +8,7 @@ type TaggedModelExtractorsChain []MetadataExtractor
 
 func NewTaggedModelExtractorsChain(metadata *KeyMetadata) TaggedModelExtractorsChain {
 	return TaggedModelExtractorsChain{
+		IntIdExtractor{metadata},
 		StringIdExtractor{metadata},
 	}
 }

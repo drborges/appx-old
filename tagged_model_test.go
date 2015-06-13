@@ -26,5 +26,24 @@ func TestTaggedModel(t *testing.T) {
 				})
 			})
 		})
+
+		Convey(`Given I have a model with a int field tagged with ds:"id"`, func() {
+			type Account struct {
+				ds.Model
+				Id   int `ds:"id"`
+				Name string
+			}
+
+			account := Account{Name: "Diego", Id: 123}
+
+			Convey("When I wrap it with TaggedModel", func() {
+				taggedAccount := ds.TaggedModel{&account}
+
+				Convey("Then KeyMetadata extracts string id from the tagged field", func() {
+					metadata := taggedAccount.KeyMetadata()
+					So(metadata.IntID, ShouldEqual, account.Id)
+				})
+			})
+		})
 	})
 }
