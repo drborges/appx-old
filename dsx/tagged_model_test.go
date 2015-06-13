@@ -8,7 +8,29 @@ import (
 )
 
 func TestTaggedModel(t *testing.T) {
+	t.Parallel()
+
 	Convey("ds.TaggedModel", t, func() {
+
+		Convey(`Given I have a model tagged with ds:"KindName"`, func() {
+			type User struct {
+				ds.Model       `ds:"Users"`
+				Name    string
+				Twitter string
+			}
+
+			user := User{Name: "Diego", Twitter: "@drborges"}
+
+			Convey("When I wrap it with TaggedModel", func() {
+				taggedUser := dsx.TaggedModel{&user}
+
+				Convey("Then KeyMetadata extracts kind information from the tag", func() {
+					metadata := taggedUser.KeyMetadata()
+					So(metadata.Kind, ShouldEqual, "Users")
+				})
+			})
+		})
+
 		Convey(`Given I have a model with a string field tagged with ds:"id"`, func() {
 			type User struct {
 				ds.Model

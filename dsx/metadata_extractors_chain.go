@@ -14,6 +14,7 @@ type TaggedModelExtractorsChain []MetadataExtractor
 
 func NewTaggedModelExtractorsChain(metadata *ds.KeyMetadata) TaggedModelExtractorsChain {
 	return TaggedModelExtractorsChain{
+		KindExtractor{metadata},
 		IntIDExtractor{metadata},
 		StringIDExtractor{metadata},
 	}
