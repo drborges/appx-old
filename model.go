@@ -13,4 +13,3 @@ func (this Model) Key() *datastore.Key {
 func (this *Model) SetKey(key *datastore.Key) {
 	this.key = key
 }
-

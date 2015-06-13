@@ -34,15 +34,23 @@ func (this Post) KeyMetadata() *ds.KeyMetadata {
 
 type Account struct {
 	ds.Model
-	Id int64
+	Id   int64
 	Name string
 }
 
 func (this Account) KeyMetadata() *ds.KeyMetadata {
 	return &ds.KeyMetadata{
-		Kind: "Accounts",
+		Kind:  "Accounts",
 		IntID: this.Id,
 	}
+}
+
+type ModelMissingKind struct {
+	ds.Model
+}
+
+func (this ModelMissingKind) KeyMetadata() *ds.KeyMetadata {
+	return &ds.KeyMetadata{}
 }
 
 func TestLoadModel(t *testing.T) {
@@ -138,12 +146,12 @@ func TestLoadModel(t *testing.T) {
 			})
 		})
 
-		Convey("Put", func() {
+		Convey("Update", func() {
 			Convey("Given I have a model with StringID key", func() {
 				tag := Tag{Name: "golang", Owner: "Borges"}
 
 				Convey("When I use ds.Datastore.Put to save it into datastore", func() {
-					err := ds.Datastore{c}.Put(&tag)
+					err := ds.Datastore{c}.Update(&tag)
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
@@ -159,6 +167,65 @@ func TestLoadModel(t *testing.T) {
 						datastore.Get(c, loadedTag.Key(), &loadedTag)
 
 						So(loadedTag, ShouldResemble, tag)
+					})
+				})
+			})
+
+			Convey("Given I have a model with invalid metadata", func() {
+				invalidModel := ModelMissingKind{}
+
+				Convey("When I update it", func() {
+					err := ds.Datastore{c}.Update(&invalidModel)
+
+					Convey("Then it fails with an error", func() {
+						So(err, ShouldNotBeNil)
+					})
+
+					Convey("Then the key is not set back to the model", func() {
+						So(invalidModel.Key(), ShouldBeNil)
+					})
+				})
+			})
+		})
+
+		Convey("Create", func() {
+			Convey("Given I have a model with auto generated key", func() {
+				post := Post{Description: "An awesome post about ds package"}
+
+				Convey("When I create it", func() {
+					err := ds.Datastore{c}.Create(&post)
+
+					Convey("Then it succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("Then the key is set back to the model", func() {
+						So(post.Key().String(), ShouldNotBeNil)
+						So(post.Key().String(), ShouldNotEqual, "/Posts,0")
+					})
+
+					Convey("Then I am able to lookup the information from datastore", func() {
+						loadedPost := Post{}
+						loadedPost.SetKey(post.Key())
+						datastore.Get(c, loadedPost.Key(), &loadedPost)
+
+						So(loadedPost, ShouldResemble, post)
+					})
+				})
+			})
+
+			Convey("Given I have a model with invalid metadata", func() {
+				invalidModel := ModelMissingKind{}
+
+				Convey("When I create it", func() {
+					err := ds.Datastore{c}.Create(&invalidModel)
+
+					Convey("Then it fails with an error", func() {
+						So(err, ShouldNotBeNil)
+					})
+
+					Convey("Then the key is not set back to the model", func() {
+						So(invalidModel.Key(), ShouldBeNil)
 					})
 				})
 			})

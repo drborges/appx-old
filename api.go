@@ -13,8 +13,12 @@ type CacheableModel interface {
 	CacheKey() string
 }
 
-type Putter interface {
-	Put(Persistable) error
+type Creator interface {
+	Create(Persistable) error
+}
+
+type Updater interface {
+	Update(Persistable) error
 }
 
 type Loader interface {
@@ -26,7 +30,8 @@ type Deleter interface {
 }
 
 type Datasource interface {
-	Putter
 	Loader
+	Creator
+	Updater
 	Deleter
 }
