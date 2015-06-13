@@ -3,8 +3,8 @@ package ds
 import "appengine/datastore"
 
 type Model struct {
-	key *datastore.Key
-	parentKey *datastore.Key
+	key       *datastore.Key `datastore:"-"`
+	parentKey *datastore.Key `datastore:"-"`
 }
 
 func (this Model) Key() *datastore.Key {
