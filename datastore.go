@@ -50,3 +50,7 @@ func (this Datastore) Delete(p Persistable) error {
 
 	return datastore.Delete(this.Context, p.Key())
 }
+
+func (this Datastore) Query(q *datastore.Query) QueryRunner {
+	return QueryRunner{this.Context, q}
+}

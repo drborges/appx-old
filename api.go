@@ -3,6 +3,7 @@ package ds
 import "appengine/datastore"
 
 type Resource interface {
+	Entity
 	UUID() string
 	SetUUID(string) error
 }
