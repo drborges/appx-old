@@ -2,6 +2,11 @@ package ds
 
 import "appengine/datastore"
 
+type Resource interface {
+	UUID() string
+	SetUUID(string) error
+}
+
 type Entity interface {
 	Key() *datastore.Key
 	SetKey(*datastore.Key)
