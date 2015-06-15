@@ -23,15 +23,16 @@ func (this *Model) SetParentKey(key *datastore.Key) {
 	this.parentKey = key
 }
 
-func (this *Model) UUID() string {
+func (this *Model) ID() string {
 	return this.Key().Encode()
 }
 
-func (this *Model) SetUUID(uuid string) error {
+func (this *Model) SetID(uuid string) error {
 	key, err := datastore.DecodeKey(uuid)
 	if err != nil {
 		return err
 	}
 	this.SetKey(key)
+	this.SetParentKey(key.Parent())
 	return nil
 }

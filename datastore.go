@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"reflect"
+	"fmt"
 )
 
 type Datastore struct {
