@@ -4,8 +4,8 @@ import "appengine/datastore"
 
 type Resource interface {
 	Entity
-	UUID() string
-	SetUUID(string) error
+	ID() string
+	SetID(string) error
 }
 
 type Entity interface {
@@ -20,9 +20,9 @@ type Persistable interface {
 	KeyMetadata() *KeyMetadata
 }
 
-type CacheableModel interface {
+type CachedPersistable interface {
 	Persistable
-	CacheKey() string
+	CacheID() string
 }
 
 type Creator interface {

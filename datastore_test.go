@@ -61,7 +61,7 @@ func TestLoadModel(t *testing.T) {
 		Convey("Load", func() {
 			Convey("Given I have a model with StringID key saved in datastore", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				key := ds.NewKey(c, tag)
+				key, _ := ds.NewKey(c, tag)
 				datastore.Put(c, key, tag)
 				tag.SetKey(key)
 
@@ -85,7 +85,7 @@ func TestLoadModel(t *testing.T) {
 
 			Convey("Given I have a model with IntID key saved in datastore", func() {
 				account := &Account{Id: 123, Name: "Borges"}
-				key := ds.NewKey(c, account)
+				key, _ := ds.NewKey(c, account)
 				datastore.Put(c, key, account)
 				account.SetKey(key)
 
@@ -109,7 +109,7 @@ func TestLoadModel(t *testing.T) {
 
 			Convey("Given I have a model with auto generated key saved in datastore", func() {
 				post := &Post{Description: "This is gonna be awesome!"}
-				incompleteKey := ds.NewKey(c, post)
+				incompleteKey, _ := ds.NewKey(c, post)
 				key, _ := datastore.Put(c, incompleteKey, post)
 				post.SetKey(key)
 
