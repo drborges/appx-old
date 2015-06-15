@@ -231,6 +231,34 @@ func TestLoadModel(t *testing.T) {
 			})
 		})
 
+		Convey("CreateAll", func() {
+			Convey("Given I have a few models", func() {
+				post1 := &Post{Description: "Post 1"}
+				post2 := &Post{Description: "Post 2"}
+				post3 := &Post{Description: "Post 3"}
+				posts := []*Post{post1, post2, post3}
+
+				Convey("When I create all", func() {
+					err := ds.Datastore{c}.CreateAll(posts)
+
+					Convey("Then it succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("Then the key is set back to the models", func() {
+						So(post1.Key().String(), ShouldNotBeNil)
+						So(post1.Key().String(), ShouldNotEqual, "/Posts,0")
+
+						So(post2.Key().String(), ShouldNotBeNil)
+						So(post2.Key().String(), ShouldNotEqual, "/Posts,0")
+
+						So(post3.Key().String(), ShouldNotBeNil)
+						So(post3.Key().String(), ShouldNotEqual, "/Posts,0")
+					})
+				})
+			})
+		})
+
 		Convey("Delete", func() {
 			Convey("Given I have a model saved in datastore", func() {
 				tag := Tag{Name: "golang", Owner: "Borges"}

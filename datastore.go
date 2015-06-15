@@ -3,6 +3,7 @@ package ds
 import (
 	"appengine"
 	"appengine/datastore"
+	"reflect"
 )
 
 type Datastore struct {
@@ -43,6 +44,34 @@ func (this Datastore) Create(p Persistable) error {
 	}
 
 	p.SetKey(key)
+	return nil
+}
+
+func (this Datastore) CreateAll(slice interface{}) error {
+	s := reflect.ValueOf(slice)
+
+	if s.Kind() != reflect.Slice {
+		return datastore.ErrInvalidEntityType
+	}
+
+	keys := make([]*datastore.Key, s.Len())
+	for i := 0; i < s.Len(); i++ {
+		key, err := NewKey(this.Context, s.Index(i).Interface().(Persistable))
+		if err != nil {
+			return err
+		}
+		keys[i] = key
+	}
+
+	keys, err := datastore.PutMulti(this.Context, keys, slice)
+	if err != nil {
+		return err
+	}
+
+	for i, key := range keys {
+		s.Index(i).Interface().(Entity).SetKey(key)
+	}
+
 	return nil
 }
 
