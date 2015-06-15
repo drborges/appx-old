@@ -146,6 +146,34 @@ func TestLoadModel(t *testing.T) {
 			})
 		})
 
+		Convey("LoadAll", func() {
+			Convey("Given I have a few entities in datastore", func() {
+				tags := []*Tag{
+					&Tag{Name: "golang", Owner: "Borges"},
+					&Tag{Name: "swift", Owner: "Diego"},
+				}
+
+				ds.Datastore{c}.CreateAll(tags)
+
+				Convey("When I load all of them", func() {
+					loadedTags := []*Tag{
+						&Tag{Name: "golang"},
+						&Tag{Name: "swift"},
+					}
+
+					err := ds.Datastore{c}.LoadAll(loadedTags)
+
+					Convey("Then it succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("Then entities have their data loaded", func() {
+						So(loadedTags, ShouldResemble, tags)
+					})
+				})
+			})
+		})
+
 		Convey("Update", func() {
 			Convey("Given I have a model with StringID key", func() {
 				tag := Tag{Name: "golang", Owner: "Borges"}

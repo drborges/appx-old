@@ -4,7 +4,6 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"reflect"
-	"fmt"
 )
 
 type Datastore struct {
@@ -17,6 +16,25 @@ func (this Datastore) Load(p Persistable) error {
 	}
 
 	return datastore.Get(this.Context, p.Key(), p)
+}
+
+func (this Datastore) LoadAll(slice interface{}) error {
+	s := reflect.ValueOf(slice)
+
+	if s.Kind() != reflect.Slice {
+		return datastore.ErrInvalidEntityType
+	}
+
+	keys := make([]*datastore.Key, s.Len())
+	for i := 0; i < s.Len(); i++ {
+		p := s.Index(i).Interface().(Persistable)
+		if err := ResolveKey(this.Context, p); err != nil {
+			return err
+		}
+		keys[i] = p.Key()
+	}
+
+	return datastore.GetMulti(this.Context, keys, slice)
 }
 
 func (this Datastore) Update(p Persistable) error {
