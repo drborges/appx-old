@@ -11,6 +11,10 @@ type QueryRunner struct {
 	Query   *datastore.Query
 }
 
+func (this QueryRunner) Count() (int, error) {
+	return this.Query.Count(this.Context)
+}
+
 func (this QueryRunner) Results(slice interface{}) error {
 	keys, err := this.Query.GetAll(this.Context, slice)
 

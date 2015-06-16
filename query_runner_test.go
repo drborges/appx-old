@@ -35,7 +35,7 @@ func TestQueryRunner(t *testing.T) {
 		q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges")
 		runner := ds.QueryRunner{c, q}
 
-		Convey("When I run the Results", func() {
+		Convey("When I run Results", func() {
 			result := []*Tag{}
 			err := runner.Results(&result)
 
@@ -53,7 +53,7 @@ func TestQueryRunner(t *testing.T) {
 			})
 		})
 
-		Convey("When I run the Result", func() {
+		Convey("When I run Result", func() {
 			tag := &Tag{}
 			err := runner.Result(tag)
 
@@ -67,6 +67,18 @@ func TestQueryRunner(t *testing.T) {
 
 			Convey("Then it sets the key back to the entity", func() {
 				So(tag.Key(), ShouldNotBeNil)
+			})
+		})
+
+		Convey("When I run Count", func() {
+			count, err := runner.Count()
+
+			Convey("Then it succeeds", func() {
+				So(err, ShouldBeNil)
+			})
+
+			Convey("Then count is 2", func() {
+				So(count, ShouldEqual, 2)
 			})
 		})
 	})
