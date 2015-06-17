@@ -10,7 +10,6 @@ import (
 )
 
 func TestCachedDatastore(t *testing.T) {
-	t.Parallel()
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
 
@@ -19,7 +18,10 @@ func TestCachedDatastore(t *testing.T) {
 			Convey("Given I have a cached model", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				ds.ResolveKey(c, tag)
-				memcache.JSON.Set(c, &memcache.Item{Key: tag.CacheID(), Object: tag})
+				memcache.JSON.Set(c, &memcache.Item{
+					Key: tag.CacheID(),
+					Object: ds.CacheableEntity{tag, tag.Key()}},
+				)
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name:tag.Name}
@@ -38,7 +40,6 @@ func TestCachedDatastore(t *testing.T) {
 			Convey("Given I have a not cached model in datastore", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				ds.Datastore{c}.Create(tag)
-				time.Sleep(1 * time.Second) // gives datastore some time to index the data before querying
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name: tag.Name}
@@ -69,6 +70,55 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then it loads the model's data", func() {
 						So(accountFromCache, ShouldResemble, account)
+					})
+				})
+			})
+		})
+
+		Convey("Create", func() {
+			Convey("Given I have a not cached entity", func() {
+				tag := &Tag{Name: "golang", Owner: "Borges"}
+
+				Convey("When I create it with CachedDatastore", func() {
+					err := ds.NewCachedDatastore(c).Create(tag)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And I can load a cacheable entity from the cache", func() {
+						cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+						memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
+						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+
+						So(cachableEntity.Cacheable, ShouldResemble, tag)
+					})
+				})
+			})
+
+			Convey("Given I have a cached entity", func() {
+				tag := &Tag{Name: "golang", Owner: "Borges"}
+				ds.ResolveKey(c, tag)
+
+				memcache.JSON.Set(c, &memcache.Item{
+					Key: tag.CacheID(),
+					Object: ds.CacheableEntity{tag, tag.Key()},
+				})
+
+				Convey("When I create the entity with CachedDatastore", func() {
+					tag.Owner = "Diego"
+					err := ds.NewCachedDatastore(c).Create(tag)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And I the cache information is overwritten", func() {
+						cachedEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+						memcache.JSON.Get(c, tag.CacheID(), cachedEntity)
+						cachedEntity.Cacheable.SetKey(cachedEntity.Key)
+
+						So(cachedEntity.Cacheable, ShouldResemble, tag)
 					})
 				})
 			})

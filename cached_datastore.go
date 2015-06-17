@@ -1,9 +1,15 @@
 package ds
 
 import (
-	"appengine/memcache"
 	"appengine"
+	"appengine/datastore"
+	"appengine/memcache"
 )
+
+type CacheableEntity struct {
+	Cacheable Cacheable
+	Key       *datastore.Key
+}
 
 type CachedDatastore struct {
 	ds Datastore
@@ -22,9 +28,12 @@ func (this CachedDatastore) Load(cacheable Cacheable) error {
 		}
 	}
 
-	// TODO check for empty CacheID
+	// TODO check for empty CacheID?
 
-	_, err := memcache.JSON.Get(this.ds.Context, cacheable.CacheID(), cacheable)
+	// Workaround to persist the not exported entity's key in the memcache
+	cacheableEntity := &CacheableEntity{cacheable, cacheable.Key()}
+	_, err := memcache.JSON.Get(this.ds.Context, cacheable.CacheID(), cacheableEntity)
+
 	if err == memcache.ErrCacheMiss {
 		// In case the given cacheable is also a queryable,
 		// the data is retrieved by executing the query
@@ -37,6 +46,20 @@ func (this CachedDatastore) Load(cacheable Cacheable) error {
 		return this.ds.Load(cacheable)
 	}
 
+	// Sets back the key to the cacheable
+	cacheable.SetKey(cacheableEntity.Key)
 	return err
 }
 
+func (this CachedDatastore) Create(cacheable Cacheable) error {
+	if err := this.ds.Create(cacheable); err != nil {
+		return err
+	}
+
+	// Saves the cacheable as an entity with the key set
+	// to an exported field so it may also be saved
+	return memcache.JSON.Set(this.ds.Context, &memcache.Item{
+		Key:    cacheable.CacheID(),
+		Object: CacheableEntity{cacheable, cacheable.Key()},
+	})
+}

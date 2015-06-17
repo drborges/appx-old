@@ -11,7 +11,6 @@ import (
 )
 
 func TestQueryRunner(t *testing.T) {
-	t.Parallel()
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
 
