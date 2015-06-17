@@ -125,6 +125,68 @@ func TestCachedDatastore(t *testing.T) {
 			})
 		})
 
+		Convey("Update", func() {
+			Convey("Given I have a cached entity", func() {
+				tag := &Tag{Name: "golang", Owner: "Borges"}
+				cds := ds.NewCachedDatastore(c)
+				cds.Create(tag)
+
+				Convey("When I update it with CachedDatastore", func() {
+					tag.Owner = "Diego"
+					err := cds.Update(tag)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And cache information is updated", func() {
+						cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+						memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
+						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+
+						So(cachableEntity.Cacheable, ShouldResemble, tag)
+					})
+
+					Convey("And datastore information is updated", func() {
+						tagFromDatastore := &Tag{Name: tag.Name}
+						ds.Datastore{c}.Load(tagFromDatastore)
+
+						So(tagFromDatastore, ShouldResemble, tag)
+					})
+				})
+			})
+
+			Convey("Given I have a cached queryable entity", func() {
+				account := &Account{Id: 12, Name: "Borges", Token: "my-auth-token"}
+				cds := ds.NewCachedDatastore(c)
+				cds.Create(account)
+
+				Convey("When I update it with CachedDatastore", func() {
+					account.Name = "Diego"
+					err := cds.Update(account)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And cache information is updated", func() {
+						cachableEntity := &ds.CacheableEntity{Cacheable: &Account{Token: account.Token}}
+						memcache.JSON.Get(c, account.CacheID(), cachableEntity)
+						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+
+						So(cachableEntity.Cacheable, ShouldResemble, account)
+					})
+
+					Convey("And datastore information is updated", func() {
+						accountFromDatastore := &Account{Id: 12}
+						ds.Datastore{c}.Load(accountFromDatastore)
+
+						So(accountFromDatastore, ShouldResemble, account)
+					})
+				})
+			})
+		})
+
 		Convey("Delete", func() {
 			Convey("Given I have an entity cached by its key", func() {
 				cds := ds.NewCachedDatastore(c)

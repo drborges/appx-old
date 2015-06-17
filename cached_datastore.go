@@ -67,6 +67,19 @@ func (this CachedDatastore) Create(cacheable Cacheable) error {
 	})
 }
 
+func (this CachedDatastore) Update(cacheable Cacheable) error {
+	if err := this.ds.Update(cacheable); err != nil {
+		return err
+	}
+
+	// Saves the cacheable as an entity with the key set
+	// to an exported field so it may also be saved
+	return memcache.JSON.Set(this.ds.Context, &memcache.Item{
+		Key:    cacheable.CacheID(),
+		Object: CacheableEntity{cacheable, cacheable.Key()},
+	})
+}
+
 func (this CachedDatastore) Delete(cacheable Cacheable) error {
 	if err := memcache.Delete(this.ds.Context, cacheable.CacheID()); err != nil {
 		return err
