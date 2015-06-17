@@ -21,6 +21,10 @@ func (this Tag) KeyMetadata() *ds.KeyMetadata {
 	}
 }
 
+func (this Tag) CacheID() string {
+	return this.Name
+}
+
 type Post struct {
 	ds.Model
 	Description string
@@ -34,8 +38,17 @@ func (this Post) KeyMetadata() *ds.KeyMetadata {
 
 type Account struct {
 	ds.Model
-	Id   int64
-	Name string
+	Id    int64
+	Token string
+	Name  string
+}
+
+func (this Account) CacheID() string {
+	return this.Token
+}
+
+func (this Account) CacheMissQuery() *datastore.Query {
+	return datastore.NewQuery(this.KeyMetadata().Kind).Filter("Token=", this.Token).Limit(1)
 }
 
 func (this Account) KeyMetadata() *ds.KeyMetadata {

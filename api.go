@@ -20,9 +20,13 @@ type Persistable interface {
 	KeyMetadata() *KeyMetadata
 }
 
-type CachedPersistable interface {
+type Cacheable interface {
 	Persistable
 	CacheID() string
+}
+
+type CacheMissQueryable interface {
+	CacheMissQuery() *datastore.Query
 }
 
 type Creator interface {
