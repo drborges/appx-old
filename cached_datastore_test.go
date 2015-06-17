@@ -7,6 +7,7 @@ import (
 	"testing"
 	"appengine/memcache"
 	"time"
+	"appengine/datastore"
 )
 
 func TestCachedDatastore(t *testing.T) {
@@ -119,6 +120,58 @@ func TestCachedDatastore(t *testing.T) {
 						cachedEntity.Cacheable.SetKey(cachedEntity.Key)
 
 						So(cachedEntity.Cacheable, ShouldResemble, tag)
+					})
+				})
+			})
+		})
+
+		Convey("Delete", func() {
+			Convey("Given I have an entity cached by its key", func() {
+				cds := ds.NewCachedDatastore(c)
+				tag := &Tag{Name: "golang", Owner: "Borges"}
+				cds.Create(tag)
+
+				Convey("When I delete the entity with CachedDatastore", func() {
+					err := cds.Delete(tag)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And the data is deleted from the cache", func() {
+						_, err := memcache.JSON.Get(c, tag.CacheID(), nil)
+						So(err, ShouldEqual, memcache.ErrCacheMiss)
+					})
+
+					Convey("And the data is deleted from datastore", func() {
+						err := ds.Datastore{c}.Load(tag)
+						So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+					})
+				})
+			})
+
+			Convey("Given I have a queryable entity cached", func() {
+				cds := ds.NewCachedDatastore(c)
+				account := &Account{Id: 321, Name: "Borges", Token: "my-auth-token"}
+				cds.Create(account)
+				account.Id = 0
+
+				Convey("When I delete the entity with CachedDatastore", func() {
+					err := cds.Delete(account)
+
+					Convey("Then it successfully deletes the entity", func() {
+						So(err, ShouldBeNil)
+					})
+
+					Convey("And the data is deleted from the cache", func() {
+						_, err := memcache.JSON.Get(c, account.CacheID(), nil)
+						So(err, ShouldEqual, memcache.ErrCacheMiss)
+					})
+
+					Convey("And the data is deleted from datastore", func() {
+						account.Id = 321
+						err := ds.Datastore{c}.Load(account)
+						So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 					})
 				})
 			})

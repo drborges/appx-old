@@ -19,6 +19,9 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	return &CachedDatastore{Datastore{c}}
 }
 
+// TODO any fallback to CacheMissQuery should be avoided in case the given entity
+// already has a key set
+
 func (this CachedDatastore) Load(cacheable Cacheable) error {
 	queryable, implementsQueryable := cacheable.(CacheMissQueryable)
 
@@ -62,4 +65,18 @@ func (this CachedDatastore) Create(cacheable Cacheable) error {
 		Key:    cacheable.CacheID(),
 		Object: CacheableEntity{cacheable, cacheable.Key()},
 	})
+}
+
+func (this CachedDatastore) Delete(cacheable Cacheable) error {
+	if err := memcache.Delete(this.ds.Context, cacheable.CacheID()); err != nil {
+		return err
+	}
+
+	// Fetches the cacheable key using the provided cache miss query
+	// so it may be deleted from datastore
+	if queryable, ok := cacheable.(CacheMissQueryable); ok {
+		this.ds.Query(queryable.CacheMissQuery()).Result(cacheable)
+	}
+
+	return this.ds.Delete(cacheable)
 }
