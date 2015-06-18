@@ -6,9 +6,9 @@
 - [X] Support to Queries runner for fetching multiple results, single result and couting matches
 - [X] Support to overwrite cache miss datastore fall back algorithm with a user defined query
 - [X] Rich set of Datastore interfaces for decoupling dependency with clients (`Loader`, `Updater`, `Creator` and `Deleter`)
-- [X] Support to ItemsIterator
-- [X] Support to PagesIterator
-- [ ] Support to Iterator as a generator function
+- [X] Support to ItemsIterator with cursors
+- [X] Support to PagesIterator with cursors
+- [ ] Support to Iterator as a generator function (channels power \m/)
 - [ ] Support memcache on batch operations `CreateAll`, `LoadAll`, `UpdateAll`, `DeleteAll` and perhaps to queries
 - [ ] Allow user to define expiration time for cached items
 - [ ] Implement: ds.Datastore#Exist(Entity) (bool, error)
