@@ -51,3 +51,9 @@ type Datasource interface {
 	Updater
 	Deleter
 }
+
+type Iterator interface {
+	LoadNext(interface{}) error
+	HasNext() bool
+	Cursor() string
+}

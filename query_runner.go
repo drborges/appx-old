@@ -42,8 +42,12 @@ func (this QueryRunner) StartFrom(cursor string) QueryRunner {
 	return this
 }
 
-func (this QueryRunner) Iterator() *DatastoreIterator {
-	return NewDatastoreIterator(this.Query, this.Context)
+func (this QueryRunner) ItemsIterator() Iterator {
+	return NewItemsIterator(this.Query, this.Context)
+}
+
+func (this QueryRunner) PagesIterator() Iterator {
+	return NewPagesIterator(this.Query, this.Context)
 }
 
 func (this QueryRunner) EntityAt(slice interface{}, i int) Entity {

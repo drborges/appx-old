@@ -5,7 +5,7 @@ import (
 	"appengine/datastore"
 )
 
-type DatastoreIterator struct {
+type itemsIterator struct {
 	query              *datastore.Query
 	context            appengine.Context
 	nextCursor         datastore.Cursor
@@ -13,8 +13,8 @@ type DatastoreIterator struct {
 	doneProcessingPage bool
 }
 
-func NewDatastoreIterator(q *datastore.Query, c appengine.Context) *DatastoreIterator {
-	return &DatastoreIterator{
+func NewItemsIterator(q *datastore.Query, c appengine.Context) Iterator {
+	return &itemsIterator{
 		query:              q,
 		context:            c,
 		nextCursor:         datastore.Cursor{},
@@ -23,7 +23,12 @@ func NewDatastoreIterator(q *datastore.Query, c appengine.Context) *DatastoreIte
 	}
 }
 
-func (this *DatastoreIterator) LoadNext(e Entity) error {
+func (this *itemsIterator) LoadNext(dst interface{}) error {
+	e, ok := dst.(Entity)
+	if !ok {
+		return datastore.ErrInvalidEntityType
+	}
+
 	iter := this.query.Run(this.context)
 	key, err := iter.Next(e)
 
@@ -33,7 +38,7 @@ func (this *DatastoreIterator) LoadNext(e Entity) error {
 
 	this.doneProcessingPage = err != nil && err == datastore.Done
 
-	if this.HasNext() {
+	if !this.HasNext() {
 		return datastore.Done
 	}
 
@@ -53,25 +58,11 @@ func (this *DatastoreIterator) LoadNext(e Entity) error {
 	return nil
 }
 
-func (this *DatastoreIterator) HasNextPage() bool {
-	return this.prevCursor != this.nextCursor
+func (this *itemsIterator) HasNext() bool {
+	return !this.doneProcessingPage || this.prevCursor != this.nextCursor
 }
 
-func (this *DatastoreIterator) HasNext() bool {
-	return this.doneProcessingPage && !this.HasNextPage()
-}
-
-func (this *DatastoreIterator) Cursor() string {
+func (this *itemsIterator) Cursor() string {
 	return this.nextCursor.String()
 }
 
-type Iterator interface {
-	LoadNext(Entity) error
-	HasNext() bool
-	HasNextPage() bool
-	Cursor() string
-	//	LoadNextPage(interface{}) bool
-	//	SkipPages(int) bool
-	//	CurrentCursor() string
-	//	PreviousCursor() string
-}
