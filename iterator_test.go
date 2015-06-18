@@ -54,6 +54,17 @@ func TestIterator(t *testing.T) {
 						})
 					})
 				})
+
+				Convey("I can create a new iterator using the cursor from the previous one", func () {
+					iterWithCursor := ds.Datastore{c}.Query(q).StartFrom(iter.Cursor()).Iterator()
+
+					Convey("I can load the second item", func() {
+						So(iterWithCursor.LoadNext(tagsFromIterator[1]), ShouldBeNil)
+						So(iterWithCursor.HasNext(), ShouldBeFalse)
+						So(iterWithCursor.HasNextPage(), ShouldBeTrue)
+						So(tagsFromIterator[1], ShouldResemble, tags[1])
+					})
+				})
 			})
 		})
 	})

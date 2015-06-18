@@ -36,6 +36,12 @@ func (this QueryRunner) Result(dst Entity) error {
 	return err
 }
 
+func (this QueryRunner) StartFrom(cursor string) QueryRunner {
+	c, _ := datastore.DecodeCursor(cursor)
+	this.Query = this.Query.Start(c)
+	return this
+}
+
 func (this QueryRunner) Iterator() *DatastoreIterator {
 	return NewDatastoreIterator(this.Query, this.Context)
 }
