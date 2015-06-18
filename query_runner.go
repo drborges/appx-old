@@ -36,6 +36,10 @@ func (this QueryRunner) Result(dst Entity) error {
 	return err
 }
 
+func (this QueryRunner) Iterator() *DatastoreIterator {
+	return NewDatastoreIterator(this.Query, this.Context)
+}
+
 func (this QueryRunner) EntityAt(slice interface{}, i int) Entity {
 	s := reflect.ValueOf(slice)
 

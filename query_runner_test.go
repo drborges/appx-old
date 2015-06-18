@@ -10,19 +10,19 @@ import (
 	"time"
 )
 
+func createAll(c appengine.Context, tags ...*Tag) {
+	keys := make([]*datastore.Key, len(tags))
+	for i, tag := range tags {
+		ds.ResolveKey(c, tag)
+		keys[i] = tag.Key()
+	}
+	datastore.PutMulti(c, keys, tags)
+	time.Sleep(1 * time.Second)
+}
+
 func TestQueryRunner(t *testing.T) {
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
-
-	createAll := func(c appengine.Context, tags ...*Tag) {
-		keys := make([]*datastore.Key, len(tags))
-		for i, tag := range tags {
-			ds.ResolveKey(c, tag)
-			keys[i] = tag.Key()
-		}
-		datastore.PutMulti(c, keys, tags)
-		time.Sleep(1 * time.Second)
-	}
 
 	golang := &Tag{Name: "golang", Owner: "Borges"}
 	swift := &Tag{Name: "swift", Owner: "Borges"}
