@@ -29,6 +29,7 @@ func TestPagesIterator(t *testing.T) {
 			Convey("Then...", func() {
 				Convey("I can load the first page", func() {
 					firstPage := []*Tag{}
+					So(iter.Cursor(), ShouldEqual, datastore.Cursor{}.String())
 					So(iter.LoadNext(&firstPage), ShouldBeNil)
 					So(iter.HasNext(), ShouldBeTrue)
 					So(firstPage, ShouldResemble, tags[0:2])

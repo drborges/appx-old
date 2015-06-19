@@ -40,15 +40,15 @@ func TestQueryRunner(t *testing.T) {
 
 			Convey("Then it succeeds", func() {
 				So(err, ShouldBeNil)
-			})
 
-			Convey("Then it loads the matched entities into the given slice", func() {
-				So(result, ShouldResemble, []*Tag{golang, swift})
-			})
+				Convey("Then it loads the matched entities into the given slice", func() {
+					So(result, ShouldResemble, []*Tag{golang, swift})
 
-			Convey("Then it sets keys back to the entities", func() {
-				So(result[0].Key(), ShouldNotBeNil)
-				So(result[1].Key(), ShouldNotBeNil)
+					Convey("Then it sets keys back to the entities", func() {
+						So(result[0].Key(), ShouldNotBeNil)
+						So(result[1].Key(), ShouldNotBeNil)
+					})
+				})
 			})
 		})
 
@@ -58,14 +58,14 @@ func TestQueryRunner(t *testing.T) {
 
 			Convey("Then it succeeds", func() {
 				So(err, ShouldBeNil)
-			})
 
-			Convey("Then it loads data into the given entity", func() {
-				So(tag, ShouldResemble, golang)
-			})
+				Convey("Then it loads data into the given entity", func() {
+					So(tag, ShouldResemble, golang)
 
-			Convey("Then it sets the key back to the entity", func() {
-				So(tag.Key(), ShouldNotBeNil)
+					Convey("Then it sets the key back to the entity", func() {
+						So(tag.Key(), ShouldNotBeNil)
+					})
+				})
 			})
 		})
 
@@ -74,10 +74,10 @@ func TestQueryRunner(t *testing.T) {
 
 			Convey("Then it succeeds", func() {
 				So(err, ShouldBeNil)
-			})
 
-			Convey("Then count is 2", func() {
-				So(count, ShouldEqual, 2)
+				Convey("Then count is 2", func() {
+					So(count, ShouldEqual, 2)
+				})
 			})
 		})
 	})

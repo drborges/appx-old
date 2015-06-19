@@ -16,24 +16,11 @@ func (this QueryRunner) Count() (int, error) {
 }
 
 func (this QueryRunner) Results(slice interface{}) error {
-	keys, err := this.Query.GetAll(this.Context, slice)
-
-	for i, key := range keys {
-		this.EntityAt(slice, i).SetKey(key)
-	}
-
-	return err
+	return this.PagesIterator().LoadNext(slice)
 }
 
-func (this QueryRunner) Result(dst Entity) error {
-	iter := this.Query.Run(this.Context)
-	key, err := iter.Next(dst)
-
-	if err == nil {
-		dst.SetKey(key)
-	}
-
-	return err
+func (this QueryRunner) Result(e Entity) error {
+	return this.ItemsIterator().LoadNext(e)
 }
 
 func (this QueryRunner) StartFrom(cursor string) QueryRunner {
