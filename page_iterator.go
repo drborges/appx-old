@@ -7,20 +7,16 @@ import (
 )
 
 type pageIterator struct {
-	query              *datastore.Query
-	context            appengine.Context
-	nextCursor         datastore.Cursor
-	prevCursor         datastore.Cursor
-	doneProcessingPage bool
+	query   *datastore.Query
+	context appengine.Context
+	nextCursor  datastore.Cursor
+	prevCursor datastore.Cursor
 }
 
 func NewPagesIterator(q *datastore.Query, c appengine.Context) Iterator {
 	return &pageIterator{
-		query:              q,
-		context:            c,
-		nextCursor:         datastore.Cursor{},
-		prevCursor:         datastore.Cursor{},
-		doneProcessingPage: false,
+		query:   q,
+		context: c,
 	}
 }
 
@@ -41,25 +37,28 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 	for {
 		dstValue := reflect.New(elemType.Elem())
 		dst := dstValue.Interface()
+
 		entity, ok := dst.(Entity)
 		if !ok {
 			return datastore.ErrInvalidEntityType
 		}
+
 		key, err := iter.Next(entity)
 		if err == datastore.Done {
-			this.doneProcessingPage = true
-			cursor, err := iter.Cursor()
-			if err != nil {
-				return err
+			cursor, cursorErr := iter.Cursor()
+			if cursorErr != nil {
+				return cursorErr
 			}
 			this.prevCursor = this.nextCursor
 			this.nextCursor = cursor
-			this.query = this.query.Start(cursor)
+			this.query = this.query.Start(this.nextCursor)
 			return err
 		}
+
 		if err != nil {
-			return nil
+			return err
 		}
+
 		entity.SetKey(key)
 		sv.Set(reflect.Append(sv, dstValue))
 	}
@@ -68,7 +67,7 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 }
 
 func (this *pageIterator) HasNext() bool {
-	return !this.doneProcessingPage || this.prevCursor != this.nextCursor
+	return this.prevCursor.String() != this.nextCursor.String()
 }
 
 func (this *pageIterator) Cursor() string {
