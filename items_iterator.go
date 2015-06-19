@@ -39,6 +39,8 @@ func (this *itemsIterator) LoadNext(dst interface{}) error {
 	this.doneProcessingPage = err != nil && err == datastore.Done
 
 	if !this.HasNext() {
+		this.prevCursor = datastore.Cursor{}
+		this.nextCursor = datastore.Cursor{}
 		return datastore.Done
 	}
 

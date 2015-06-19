@@ -30,7 +30,7 @@ func TestQueryRunner(t *testing.T) {
 
 	createAll(c, golang, swift, ruby)
 
-	Convey("Given I have a QueryRunner setup", t, func() {
+	Convey("Given I have a QueryRunner", t, func() {
 		q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges")
 		runner := ds.QueryRunner{c, q}
 
@@ -39,7 +39,7 @@ func TestQueryRunner(t *testing.T) {
 			err := runner.Results(&result)
 
 			Convey("Then it succeeds", func() {
-				So(err, ShouldEqual, datastore.Done)
+				So(err, ShouldBeNil)
 
 				Convey("Then it loads the matched entities into the given slice", func() {
 					So(result, ShouldResemble, []*Tag{golang, swift})
