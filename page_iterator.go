@@ -7,10 +7,11 @@ import (
 )
 
 type pageIterator struct {
-	query   *datastore.Query
-	context appengine.Context
-	nextCursor  datastore.Cursor
+	query      *datastore.Query
+	context    appengine.Context
+	nextCursor datastore.Cursor
 	prevCursor datastore.Cursor
+	started    bool
 }
 
 func NewPagesIterator(q *datastore.Query, c appengine.Context) Iterator {
@@ -33,6 +34,7 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 		return datastore.ErrInvalidEntityType
 	}
 
+	this.started = true
 	iter := this.query.Run(this.context)
 	for {
 		dstValue := reflect.New(elemType.Elem())
@@ -55,8 +57,9 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 			if !this.HasNext() {
 				this.prevCursor = datastore.Cursor{}
 				this.nextCursor = datastore.Cursor{}
+				return datastore.Done
 			}
-			return err
+			break
 		}
 
 		if err != nil {
@@ -71,7 +74,7 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 }
 
 func (this *pageIterator) HasNext() bool {
-	return this.prevCursor.String() != this.nextCursor.String()
+	return !this.started || this.prevCursor.String() != this.nextCursor.String()
 }
 
 func (this *pageIterator) Cursor() string {

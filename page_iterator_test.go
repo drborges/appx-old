@@ -29,14 +29,14 @@ func TestPagesIterator(t *testing.T) {
 			Convey("Then I can load the first page", func() {
 				firstPage := []*Tag{}
 				So(iter.Cursor(), ShouldBeEmpty)
-				So(iter.LoadNext(&firstPage), ShouldEqual, datastore.Done)
+				So(iter.LoadNext(&firstPage), ShouldBeNil)
 				So(iter.HasNext(), ShouldBeTrue)
 				So(firstPage, ShouldResemble, tags[0:2])
 
 				Convey("Then I can load the second page", func() {
 					secondPage := []*Tag{}
 					So(iter.Cursor(), ShouldNotBeEmpty)
-					So(iter.LoadNext(&secondPage), ShouldEqual, datastore.Done)
+					So(iter.LoadNext(&secondPage), ShouldBeNil)
 					So(iter.HasNext(), ShouldBeTrue)
 					So(secondPage, ShouldResemble, tags[2:])
 
@@ -51,6 +51,27 @@ func TestPagesIterator(t *testing.T) {
 			})
 		})
 
+		Convey("Given I have a pages iterator with 4 pages each with 1 item", func() {
+			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(1)
+			iter := ds.Datastore{c}.Query(q).PagesIterator()
+
+			Convey("Then I can load pages until iterator has no more pages", func() {
+				pages := [][]*Tag{}
+				for iter.HasNext() {
+					page := []*Tag{}
+					if err := iter.LoadNext(&page); err == nil {
+						pages = append(pages, page)
+					}
+				}
+
+				So(len(pages), ShouldEqual, 4)
+				So(pages[0], ShouldResemble, []*Tag{tags[0]})
+				So(pages[1], ShouldResemble, []*Tag{tags[1]})
+				So(pages[2], ShouldResemble, []*Tag{tags[2]})
+				So(pages[3], ShouldResemble, []*Tag{tags[3]})
+			})
+		})
+
 		Convey("Given I have a pages iterator with cursor starting from the second and last page", func() {
 			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(2)
 			firstPage := &[]*Tag{}
@@ -61,7 +82,7 @@ func TestPagesIterator(t *testing.T) {
 
 			Convey("Then I can load the page", func() {
 				secondPage := []*Tag{}
-				So(iterStartingFromSecondPage.LoadNext(&secondPage), ShouldEqual, datastore.Done)
+				So(iterStartingFromSecondPage.LoadNext(&secondPage), ShouldBeNil)
 				So(iterStartingFromSecondPage.HasNext(), ShouldBeTrue)
 				So(iterStartingFromSecondPage.Cursor(), ShouldNotBeEmpty)
 				So(secondPage, ShouldResemble, tags[2:])
