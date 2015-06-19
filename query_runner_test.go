@@ -39,7 +39,7 @@ func TestQueryRunner(t *testing.T) {
 			err := runner.Results(&result)
 
 			Convey("Then it succeeds", func() {
-				So(err, ShouldBeNil)
+				So(err, ShouldEqual, datastore.Done)
 
 				Convey("Then it loads the matched entities into the given slice", func() {
 					So(result, ShouldResemble, []*Tag{golang, swift})

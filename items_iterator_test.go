@@ -63,5 +63,25 @@ func TestItemsIterator(t *testing.T) {
 				})
 			})
 		})
+
+		Convey("Given I have an items iterator with zero items", func() {
+			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "non existent").Limit(1)
+			iter := ds.Datastore{c}.Query(q).ItemsIterator()
+
+			Convey("When I load the next item", func() {
+				firstItem := Tag{}
+				So(iter.Cursor(), ShouldBeEmpty)
+				So(iter.LoadNext(&firstItem), ShouldEqual, datastore.Done)
+				So(iter.Cursor(), ShouldBeEmpty)
+
+				Convey("Then the item is not populated", func() {
+					So(firstItem, ShouldResemble, Tag{})
+
+					Convey("Then it has no more results", func () {
+						So(iter.HasNext(), ShouldBeFalse)
+					})
+				})
+			})
+		})
 	})
 }
