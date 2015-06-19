@@ -1,9 +1,9 @@
-package ds_test
+package appx_test
 
 import (
 	"appengine/aetest"
 	"appengine/datastore"
-	"github.com/drborges/ds"
+	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"appengine"
@@ -13,7 +13,7 @@ import (
 func createAll(c appengine.Context, tags ...*Tag) {
 	keys := make([]*datastore.Key, len(tags))
 	for i, tag := range tags {
-		ds.ResolveKey(c, tag)
+		appx.ResolveKey(c, tag)
 		keys[i] = tag.Key()
 	}
 	datastore.PutMulti(c, keys, tags)
@@ -32,7 +32,7 @@ func TestQueryRunner(t *testing.T) {
 
 	Convey("Given I have a QueryRunner", t, func() {
 		q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges")
-		runner := ds.QueryRunner{c, q}
+		runner := appx.QueryRunner{c, q}
 
 		Convey("When I run Results", func() {
 			result := []*Tag{}

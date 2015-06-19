@@ -1,4 +1,4 @@
-package ds_test
+package appx_test
 
 import (
 	"appengine/aetest"
@@ -11,7 +11,7 @@ func TestModel(t *testing.T) {
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
 
-	Convey("ds.Model", t, func() {
+	Convey("appx.Model", t, func() {
 		Convey("Given I have a model with parent key", func() {
 			parentKey := datastore.NewKey(c, "User", "Borges", 0, nil)
 			commentKey := datastore.NewKey(c, "Comments", "", 0, parentKey)

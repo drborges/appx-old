@@ -1,8 +1,8 @@
-package ds_test
+package appx_test
 
 import (
 	"appengine/aetest"
-	"github.com/drborges/ds"
+	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"appengine/memcache"
@@ -18,15 +18,15 @@ func TestCachedDatastore(t *testing.T) {
 		Convey("Load", func() {
 			Convey("Given I have a cached model", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				ds.ResolveKey(c, tag)
+				appx.ResolveKey(c, tag)
 				memcache.JSON.Set(c, &memcache.Item{
 					Key: tag.CacheID(),
-					Object: ds.CacheableEntity{tag, tag.Key()}},
+					Object: appx.CacheableEntity{tag, tag.Key()}},
 				)
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name:tag.Name}
-					err := ds.NewCachedDatastore(c).Load(tagFromCache)
+					err := appx.NewCachedDatastore(c).Load(tagFromCache)
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
@@ -40,11 +40,11 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a not cached model in datastore", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				ds.Datastore{c}.Create(tag)
+				appx.Datastore{c}.Create(tag)
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name: tag.Name}
-					err := ds.NewCachedDatastore(c).Load(tagFromCache)
+					err := appx.NewCachedDatastore(c).Load(tagFromCache)
 
 					Convey("Then it successfully falls back to datastore look up by key", func() {
 						So(err, ShouldBeNil)
@@ -58,12 +58,12 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a not cached queryable model in datastore", func() {
 				account := &Account{Name: "Borges", Token: "my-auth-token"} // datastore key not resolved
-				ds.Datastore{c}.Create(account)
+				appx.Datastore{c}.Create(account)
 				time.Sleep(1 * time.Second) // gives datastore some time to index the data before querying
 
 				Convey("When I load it with CachedDatastore", func() {
 					accountFromCache := &Account{Token: account.Token}
-					err := ds.NewCachedDatastore(c).Load(accountFromCache)
+					err := appx.NewCachedDatastore(c).Load(accountFromCache)
 
 					Convey("Then it successfully falls back to the provided CacheMissQuery", func() {
 						So(err, ShouldBeNil)
@@ -81,13 +81,13 @@ func TestCachedDatastore(t *testing.T) {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 
 				Convey("When I create it with CachedDatastore", func() {
-					err := ds.NewCachedDatastore(c).Create(tag)
+					err := appx.NewCachedDatastore(c).Create(tag)
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
 
 						Convey("And I can load a cacheable entity from the cache", func() {
-							cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							cachableEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
 							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
 							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
@@ -99,22 +99,22 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a cached entity", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				ds.ResolveKey(c, tag)
+				appx.ResolveKey(c, tag)
 
 				memcache.JSON.Set(c, &memcache.Item{
 					Key: tag.CacheID(),
-					Object: ds.CacheableEntity{tag, tag.Key()},
+					Object: appx.CacheableEntity{tag, tag.Key()},
 				})
 
 				Convey("When I create the entity with CachedDatastore", func() {
 					tag.Owner = "Diego"
-					err := ds.NewCachedDatastore(c).Create(tag)
+					err := appx.NewCachedDatastore(c).Create(tag)
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
 
 						Convey("And I the cache information is overwritten", func() {
-							cachedEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							cachedEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
 							memcache.JSON.Get(c, tag.CacheID(), cachedEntity)
 							cachedEntity.Cacheable.SetKey(cachedEntity.Key)
 
@@ -128,7 +128,7 @@ func TestCachedDatastore(t *testing.T) {
 		Convey("Update", func() {
 			Convey("Given I have a cached entity", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				cds := ds.NewCachedDatastore(c)
+				cds := appx.NewCachedDatastore(c)
 				cds.Create(tag)
 
 				Convey("When I update it with CachedDatastore", func() {
@@ -139,7 +139,7 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And cache information is updated", func() {
-							cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							cachableEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
 							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
 							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
@@ -147,7 +147,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And datastore information is updated", func() {
 								tagFromDatastore := &Tag{Name: tag.Name}
-								ds.Datastore{c}.Load(tagFromDatastore)
+								appx.Datastore{c}.Load(tagFromDatastore)
 
 								So(tagFromDatastore, ShouldResemble, tag)
 							})
@@ -158,7 +158,7 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a cached queryable entity", func() {
 				account := &Account{Id: 12, Name: "Borges", Token: "my-auth-token"}
-				cds := ds.NewCachedDatastore(c)
+				cds := appx.NewCachedDatastore(c)
 				cds.Create(account)
 
 				Convey("When I update it with CachedDatastore", func() {
@@ -169,7 +169,7 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And cache information is updated", func() {
-							cachableEntity := &ds.CacheableEntity{Cacheable: &Account{Token: account.Token}}
+							cachableEntity := &appx.CacheableEntity{Cacheable: &Account{Token: account.Token}}
 							memcache.JSON.Get(c, account.CacheID(), cachableEntity)
 							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
@@ -177,7 +177,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And datastore information is updated", func() {
 								accountFromDatastore := &Account{Id: 12}
-								ds.Datastore{c}.Load(accountFromDatastore)
+								appx.Datastore{c}.Load(accountFromDatastore)
 
 								So(accountFromDatastore, ShouldResemble, account)
 							})
@@ -189,7 +189,7 @@ func TestCachedDatastore(t *testing.T) {
 
 		Convey("Delete", func() {
 			Convey("Given I have an entity cached by its key", func() {
-				cds := ds.NewCachedDatastore(c)
+				cds := appx.NewCachedDatastore(c)
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				cds.Create(tag)
 
@@ -204,7 +204,7 @@ func TestCachedDatastore(t *testing.T) {
 							So(err, ShouldEqual, memcache.ErrCacheMiss)
 
 							Convey("And the data is deleted from datastore", func() {
-								err := ds.Datastore{c}.Load(tag)
+								err := appx.Datastore{c}.Load(tag)
 								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 							})
 						})
@@ -213,7 +213,7 @@ func TestCachedDatastore(t *testing.T) {
 			})
 
 			Convey("Given I have a queryable entity cached", func() {
-				cds := ds.NewCachedDatastore(c)
+				cds := appx.NewCachedDatastore(c)
 				account := &Account{Id: 321, Name: "Borges", Token: "my-auth-token"}
 				cds.Create(account)
 				account.Id = 0
@@ -230,7 +230,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And the data is deleted from datastore", func() {
 								account.Id = 321
-								err := ds.Datastore{c}.Load(account)
+								err := appx.Datastore{c}.Load(account)
 								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 							})
 						})

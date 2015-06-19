@@ -1,4 +1,4 @@
-package ds
+package appx
 
 import "appengine/datastore"
 

@@ -1,4 +1,4 @@
-package ds
+package appx
 
 import "appengine/datastore"
 
@@ -27,8 +27,8 @@ func (this *Model) ID() string {
 	return this.Key().Encode()
 }
 
-func (this *Model) SetID(uuid string) error {
-	key, err := datastore.DecodeKey(uuid)
+func (this *Model) SetID(id string) error {
+	key, err := datastore.DecodeKey(id)
 	if err != nil {
 		return err
 	}

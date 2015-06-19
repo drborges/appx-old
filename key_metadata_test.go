@@ -1,20 +1,20 @@
-package ds_test
+package appx_test
 
 import (
 	"appengine/aetest"
 	"appengine/datastore"
-	"github.com/drborges/ds"
+	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
 type Comment struct {
-	ds.Model
+	appx.Model
 	Content string
 }
 
-func (this Comment) KeyMetadata() *ds.KeyMetadata {
-	return &ds.KeyMetadata{
+func (this Comment) KeyMetadata() *appx.KeyMetadata {
+	return &appx.KeyMetadata{
 		Kind: "Comments",
 		HasParent: true,
 	}
@@ -31,7 +31,7 @@ func TestKeyMetadata(t *testing.T) {
 				post := &Post{Description: "Super cool!"}
 				post.SetParentKey(parentKey)
 
-				key, err := ds.NewKey(c, post)
+				key, err := appx.NewKey(c, post)
 
 				So(err, ShouldBeNil)
 				So(key.Parent(), ShouldResemble, parentKey)
@@ -42,7 +42,7 @@ func TestKeyMetadata(t *testing.T) {
 				comment := &Comment{Content: "Super cool!"}
 				comment.SetParentKey(parentKey)
 
-				key, err := ds.NewKey(c, comment)
+				key, err := appx.NewKey(c, comment)
 
 				So(err, ShouldBeNil)
 				So(key.Parent(), ShouldResemble, parentKey)
@@ -55,7 +55,7 @@ func TestKeyMetadata(t *testing.T) {
 				tag := &Tag{Name: "golang"}
 				tag.SetParentKey(parentKey)
 
-				err := ds.ResolveKey(c, tag)
+				err := appx.ResolveKey(c, tag)
 
 				So(err, ShouldBeNil)
 				So(tag.Key(), ShouldNotBeNil)
@@ -67,10 +67,10 @@ func TestKeyMetadata(t *testing.T) {
 				comment := &Comment{Content: "Super cool!"}
 				comment.SetParentKey(datastore.NewKey(c, "Account", "", 0, nil))
 
-				err := ds.ResolveKey(c, comment)
+				err := appx.ResolveKey(c, comment)
 
 				So(comment.Key(), ShouldBeNil)
-				So(err, ShouldEqual, ds.ErrUnresolvableKey)
+				So(err, ShouldEqual, appx.ErrUnresolvableKey)
 			})
 
 			Convey("returns ErrUnresolvableKey if key set is incomplete", func() {
@@ -78,18 +78,18 @@ func TestKeyMetadata(t *testing.T) {
 				comment.SetKey(datastore.NewIncompleteKey(c, "Posts", nil))
 				comment.SetParentKey(datastore.NewKey(c, "Account", "", 0, nil))
 
-				err := ds.ResolveKey(c, comment)
+				err := appx.ResolveKey(c, comment)
 
-				So(err, ShouldEqual, ds.ErrUnresolvableKey)
+				So(err, ShouldEqual, appx.ErrUnresolvableKey)
 			})
 
 			Convey("returns ErrMissingParentKey if parent key is not set", func() {
 				comment := &Comment{Content: "Super cool!"}
 				comment.SetKey(datastore.NewIncompleteKey(c, "Posts", nil))
 
-				err := ds.ResolveKey(c, comment)
+				err := appx.ResolveKey(c, comment)
 
-				So(err, ShouldEqual, ds.ErrMissingParentKey)
+				So(err, ShouldEqual, appx.ErrMissingParentKey)
 			})
 		})
 	})
