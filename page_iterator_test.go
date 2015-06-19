@@ -42,11 +42,36 @@ func TestPagesIterator(t *testing.T) {
 
 					Convey("Then I cannot load more pages", func() {
 						page := []*Tag{}
-						So(iter.Cursor(), ShouldNotBeEmpty)
 						So(iter.LoadNext(&page), ShouldEqual, datastore.Done)
 						So(iter.HasNext(), ShouldBeFalse)
+						So(iter.Cursor(), ShouldBeEmpty)
 						So(page, ShouldBeEmpty)
 					})
+				})
+			})
+		})
+
+		Convey("Given I have a pages iterator with cursor starting from the second and last page", func() {
+			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(2)
+			firstPage := &[]*Tag{}
+			prevIter := ds.Datastore{c}.Query(q).PagesIterator()
+			prevIter.LoadNext(firstPage)
+
+			iterStartingFromSecondPage := ds.Datastore{c}.Query(q).StartFrom(prevIter.Cursor()).PagesIterator()
+
+			Convey("Then I can load the page", func() {
+				secondPage := []*Tag{}
+				So(iterStartingFromSecondPage.LoadNext(&secondPage), ShouldEqual, datastore.Done)
+				So(iterStartingFromSecondPage.HasNext(), ShouldBeTrue)
+				So(iterStartingFromSecondPage.Cursor(), ShouldNotBeEmpty)
+				So(secondPage, ShouldResemble, tags[2:])
+
+				Convey("Then I cannot load more pages", func() {
+					page := []*Tag{}
+					So(iterStartingFromSecondPage.LoadNext(&page), ShouldEqual, datastore.Done)
+					So(iterStartingFromSecondPage.HasNext(), ShouldBeFalse)
+					So(iterStartingFromSecondPage.Cursor(), ShouldBeEmpty)
+					So(page, ShouldBeEmpty)
 				})
 			})
 		})
@@ -57,15 +82,17 @@ func TestPagesIterator(t *testing.T) {
 
 			Convey("When I load the next page", func() {
 				firstPage := []*Tag{}
-				So(iter.Cursor(), ShouldBeEmpty)
 				So(iter.LoadNext(&firstPage), ShouldEqual, datastore.Done)
-				So(iter.Cursor(), ShouldBeEmpty)
 
 				Convey("Then the page is empty", func() {
 					So(firstPage, ShouldBeEmpty)
 
-					Convey("Then it has no more results", func () {
-						So(iter.HasNext(), ShouldBeFalse)
+					Convey("Then the cursor is empty", func() {
+						So(iter.Cursor(), ShouldBeEmpty)
+
+						Convey("Then it has no more results", func() {
+							So(iter.HasNext(), ShouldBeFalse)
+						})
 					})
 				})
 			})

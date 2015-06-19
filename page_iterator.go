@@ -52,6 +52,10 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 			this.prevCursor = this.nextCursor
 			this.nextCursor = cursor
 			this.query = this.query.Start(this.nextCursor)
+			if !this.HasNext() {
+				this.prevCursor = datastore.Cursor{}
+				this.nextCursor = datastore.Cursor{}
+			}
 			return err
 		}
 
