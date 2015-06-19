@@ -30,10 +30,10 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then it loads the model's data", func() {
-						So(tagFromCache, ShouldResemble, tag)
+						Convey("Then it loads the model's data", func() {
+							So(tagFromCache, ShouldResemble, tag)
+						})
 					})
 				})
 			})
@@ -48,10 +48,10 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then it successfully falls back to datastore look up by key", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then it loads the model's data", func() {
-						So(tagFromCache, ShouldResemble, tag)
+						Convey("Then it loads the model's data", func() {
+							So(tagFromCache, ShouldResemble, tag)
+						})
 					})
 				})
 			})
@@ -67,10 +67,10 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then it successfully falls back to the provided CacheMissQuery", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then it loads the model's data", func() {
-						So(accountFromCache, ShouldResemble, account)
+						Convey("Then it loads the model's data", func() {
+							So(accountFromCache, ShouldResemble, account)
+						})
 					})
 				})
 			})
@@ -85,14 +85,14 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And I can load a cacheable entity from the cache", func() {
-						cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-						memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
-						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+						Convey("And I can load a cacheable entity from the cache", func() {
+							cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
+							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
-						So(cachableEntity.Cacheable, ShouldResemble, tag)
+							So(cachableEntity.Cacheable, ShouldResemble, tag)
+						})
 					})
 				})
 			})
@@ -112,14 +112,14 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And I the cache information is overwritten", func() {
-						cachedEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-						memcache.JSON.Get(c, tag.CacheID(), cachedEntity)
-						cachedEntity.Cacheable.SetKey(cachedEntity.Key)
+						Convey("And I the cache information is overwritten", func() {
+							cachedEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							memcache.JSON.Get(c, tag.CacheID(), cachedEntity)
+							cachedEntity.Cacheable.SetKey(cachedEntity.Key)
 
-						So(cachedEntity.Cacheable, ShouldResemble, tag)
+							So(cachedEntity.Cacheable, ShouldResemble, tag)
+						})
 					})
 				})
 			})
@@ -137,21 +137,21 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And cache information is updated", func() {
-						cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-						memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
-						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+						Convey("And cache information is updated", func() {
+							cachableEntity := &ds.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
+							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
+							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
-						So(cachableEntity.Cacheable, ShouldResemble, tag)
-					})
+							So(cachableEntity.Cacheable, ShouldResemble, tag)
 
-					Convey("And datastore information is updated", func() {
-						tagFromDatastore := &Tag{Name: tag.Name}
-						ds.Datastore{c}.Load(tagFromDatastore)
+							Convey("And datastore information is updated", func() {
+								tagFromDatastore := &Tag{Name: tag.Name}
+								ds.Datastore{c}.Load(tagFromDatastore)
 
-						So(tagFromDatastore, ShouldResemble, tag)
+								So(tagFromDatastore, ShouldResemble, tag)
+							})
+						})
 					})
 				})
 			})
@@ -167,21 +167,21 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And cache information is updated", func() {
-						cachableEntity := &ds.CacheableEntity{Cacheable: &Account{Token: account.Token}}
-						memcache.JSON.Get(c, account.CacheID(), cachableEntity)
-						cachableEntity.Cacheable.SetKey(cachableEntity.Key)
+						Convey("And cache information is updated", func() {
+							cachableEntity := &ds.CacheableEntity{Cacheable: &Account{Token: account.Token}}
+							memcache.JSON.Get(c, account.CacheID(), cachableEntity)
+							cachableEntity.Cacheable.SetKey(cachableEntity.Key)
 
-						So(cachableEntity.Cacheable, ShouldResemble, account)
-					})
+							So(cachableEntity.Cacheable, ShouldResemble, account)
 
-					Convey("And datastore information is updated", func() {
-						accountFromDatastore := &Account{Id: 12}
-						ds.Datastore{c}.Load(accountFromDatastore)
+							Convey("And datastore information is updated", func() {
+								accountFromDatastore := &Account{Id: 12}
+								ds.Datastore{c}.Load(accountFromDatastore)
 
-						So(accountFromDatastore, ShouldResemble, account)
+								So(accountFromDatastore, ShouldResemble, account)
+							})
+						})
 					})
 				})
 			})
@@ -198,16 +198,16 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then the operation succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And the data is deleted from the cache", func() {
-						_, err := memcache.JSON.Get(c, tag.CacheID(), nil)
-						So(err, ShouldEqual, memcache.ErrCacheMiss)
-					})
+						Convey("And the data is deleted from the cache", func() {
+							_, err := memcache.JSON.Get(c, tag.CacheID(), nil)
+							So(err, ShouldEqual, memcache.ErrCacheMiss)
 
-					Convey("And the data is deleted from datastore", func() {
-						err := ds.Datastore{c}.Load(tag)
-						So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+							Convey("And the data is deleted from datastore", func() {
+								err := ds.Datastore{c}.Load(tag)
+								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+							})
+						})
 					})
 				})
 			})
@@ -223,17 +223,17 @@ func TestCachedDatastore(t *testing.T) {
 
 					Convey("Then it successfully deletes the entity", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("And the data is deleted from the cache", func() {
-						_, err := memcache.JSON.Get(c, account.CacheID(), nil)
-						So(err, ShouldEqual, memcache.ErrCacheMiss)
-					})
+						Convey("And the data is deleted from the cache", func() {
+							_, err := memcache.JSON.Get(c, account.CacheID(), nil)
+							So(err, ShouldEqual, memcache.ErrCacheMiss)
 
-					Convey("And the data is deleted from datastore", func() {
-						account.Id = 321
-						err := ds.Datastore{c}.Load(account)
-						So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+							Convey("And the data is deleted from datastore", func() {
+								account.Id = 321
+								err := ds.Datastore{c}.Load(account)
+								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+							})
+						})
 					})
 				})
 			})

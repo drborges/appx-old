@@ -3,7 +3,6 @@ package ds
 import (
 	"appengine"
 	"appengine/datastore"
-	"reflect"
 )
 
 type QueryRunner struct {
@@ -37,16 +36,3 @@ func (this QueryRunner) PagesIterator() Iterator {
 	return NewPagesIterator(this.Query, this.Context)
 }
 
-func (this QueryRunner) EntityAt(slice interface{}, i int) Entity {
-	s := reflect.ValueOf(slice)
-
-	if s.Kind() == reflect.Slice {
-		return s.Index(i).Interface().(Entity)
-	}
-
-	if s.Kind() == reflect.Ptr && s.Type().Elem().Kind() == reflect.Slice {
-		return s.Elem().Index(i).Interface().(Entity)
-	}
-
-	panic(datastore.ErrInvalidEntityType)
-}

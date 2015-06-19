@@ -2,9 +2,9 @@ package ds_test
 
 import (
 	"appengine/aetest"
-	"appengine/datastore"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+	"appengine/datastore"
 )
 
 func TestModel(t *testing.T) {
@@ -22,14 +22,14 @@ func TestModel(t *testing.T) {
 
 				Convey("Then it succeeds", func() {
 					So(err, ShouldBeNil)
-				})
 
-				Convey("Then its key is set", func() {
-					So(comment.Key(), ShouldResemble, commentKey)
-				})
+					Convey("Then its key is set", func() {
+						So(comment.Key(), ShouldResemble, commentKey)
 
-				Convey("Then its parent key is set", func() {
-					So(comment.ParentKey(), ShouldResemble, parentKey)
+						Convey("Then its parent key is set", func() {
+							So(comment.ParentKey(), ShouldResemble, parentKey)
+						})
+					})
 				})
 			})
 		})

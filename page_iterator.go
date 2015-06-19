@@ -25,9 +25,6 @@ func NewPagesIterator(q *datastore.Query, c appengine.Context) Iterator {
 }
 
 // TODO refactor this mess :~
-// Perhaps it would be better to have a PerPageIterator and a PerItemIterator
-// to avoid messing up with the iterator internal state when using
-// LoadNext and LoadNextPage intermittently
 func (this *pageIterator) LoadNext(slice interface{}) error {
 	sv := reflect.ValueOf(slice)
 	if sv.Kind() != reflect.Ptr || sv.IsNil() || sv.Elem().Kind() != reflect.Slice {

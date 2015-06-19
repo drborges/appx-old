@@ -84,14 +84,14 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the data is loaded from datastore", func() {
-						So(&loadedTag, ShouldResemble, tag)
-					})
+						Convey("Then the data is loaded from datastore", func() {
+							So(&loadedTag, ShouldResemble, tag)
 
-					Convey("Then the model has its key resolved", func() {
-						So(loadedTag.Key(), ShouldNotBeNil)
+							Convey("Then the model has its key resolved", func() {
+								So(loadedTag.Key(), ShouldNotBeNil)
+							})
+						})
 					})
 				})
 			})
@@ -108,14 +108,14 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the data is loaded from datastore", func() {
-						So(&loadedAccount, ShouldResemble, account)
-					})
+						Convey("Then the data is loaded from datastore", func() {
+							So(&loadedAccount, ShouldResemble, account)
 
-					Convey("Then the model has its key resolved", func() {
-						So(loadedAccount.Key(), ShouldNotBeNil)
+							Convey("Then the model has its key resolved", func() {
+								So(loadedAccount.Key(), ShouldNotBeNil)
+							})
+						})
 					})
 				})
 			})
@@ -133,14 +133,14 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the data is loaded from datastore", func() {
-						So(&loadedPost, ShouldResemble, post)
-					})
+						Convey("Then the data is loaded from datastore", func() {
+							So(&loadedPost, ShouldResemble, post)
 
-					Convey("Then the model has its key resolved", func() {
-						So(loadedPost.Key(), ShouldNotBeNil)
+							Convey("Then the model has its key resolved", func() {
+								So(loadedPost.Key(), ShouldNotBeNil)
+							})
+						})
 					})
 				})
 			})
@@ -178,10 +178,10 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then entities have their data loaded", func() {
-						So(loadedTags, ShouldResemble, tags)
+						Convey("Then entities have their data loaded", func() {
+							So(loadedTags, ShouldResemble, tags)
+						})
 					})
 				})
 			})
@@ -196,18 +196,18 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the key is set back to the model", func() {
-						So(tag.Key().String(), ShouldEqual, "/Tags,golang")
-					})
+						Convey("Then the key is set back to the model", func() {
+							So(tag.Key().String(), ShouldEqual, "/Tags,golang")
 
-					Convey("Then I am able to lookup the information from datastore", func() {
-						loadedTag := Tag{}
-						loadedTag.SetKey(tag.Key())
-						datastore.Get(c, loadedTag.Key(), &loadedTag)
+							Convey("Then I am able to lookup the information from datastore", func() {
+								loadedTag := Tag{}
+								loadedTag.SetKey(tag.Key())
+								datastore.Get(c, loadedTag.Key(), &loadedTag)
 
-						So(loadedTag, ShouldResemble, tag)
+								So(loadedTag, ShouldResemble, tag)
+							})
+						})
 					})
 				})
 			})
@@ -220,10 +220,10 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it fails with an error", func() {
 						So(err, ShouldNotBeNil)
-					})
 
-					Convey("Then the key is not set back to the model", func() {
-						So(invalidModel.Key(), ShouldBeNil)
+						Convey("Then the key is not set back to the model", func() {
+							So(invalidModel.Key(), ShouldBeNil)
+						})
 					})
 				})
 			})
@@ -238,19 +238,19 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the key is set back to the model", func() {
-						So(post.Key().String(), ShouldNotBeNil)
-						So(post.Key().String(), ShouldNotEqual, "/Posts,0")
-					})
+						Convey("Then the key is set back to the model", func() {
+							So(post.Key().String(), ShouldNotBeNil)
+							So(post.Key().String(), ShouldNotEqual, "/Posts,0")
 
-					Convey("Then I am able to lookup the information from datastore", func() {
-						loadedPost := Post{}
-						loadedPost.SetKey(post.Key())
-						datastore.Get(c, loadedPost.Key(), &loadedPost)
+							Convey("Then I am able to lookup the information from datastore", func() {
+								loadedPost := Post{}
+								loadedPost.SetKey(post.Key())
+								datastore.Get(c, loadedPost.Key(), &loadedPost)
 
-						So(loadedPost, ShouldResemble, post)
+								So(loadedPost, ShouldResemble, post)
+							})
+						})
 					})
 				})
 			})
@@ -263,10 +263,10 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it fails with an error", func() {
 						So(err, ShouldNotBeNil)
-					})
 
-					Convey("Then the key is not set back to the model", func() {
-						So(invalidModel.Key(), ShouldBeNil)
+						Convey("Then the key is not set back to the model", func() {
+							So(invalidModel.Key(), ShouldBeNil)
+						})
 					})
 				})
 			})
@@ -284,17 +284,17 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the key is set back to the models", func() {
-						So(post1.Key().String(), ShouldNotBeNil)
-						So(post1.Key().String(), ShouldNotEqual, "/Posts,0")
+						Convey("Then the key is set back to the models", func() {
+							So(post1.Key().String(), ShouldNotBeNil)
+							So(post1.Key().String(), ShouldNotEqual, "/Posts,0")
 
-						So(post2.Key().String(), ShouldNotBeNil)
-						So(post2.Key().String(), ShouldNotEqual, "/Posts,0")
+							So(post2.Key().String(), ShouldNotBeNil)
+							So(post2.Key().String(), ShouldNotEqual, "/Posts,0")
 
-						So(post3.Key().String(), ShouldNotBeNil)
-						So(post3.Key().String(), ShouldNotEqual, "/Posts,0")
+							So(post3.Key().String(), ShouldNotBeNil)
+							So(post3.Key().String(), ShouldNotEqual, "/Posts,0")
+						})
 					})
 				})
 			})
@@ -309,11 +309,11 @@ func TestLoadModel(t *testing.T) {
 
 					Convey("Then it succeeds", func() {
 						So(err, ShouldBeNil)
-					})
 
-					Convey("Then the model does not exist in datastore", func() {
-						err = datastore.Get(c, tag.Key(), nil)
-						So(err, ShouldNotBeNil)
+						Convey("Then the model does not exist in datastore", func() {
+							err = datastore.Get(c, tag.Key(), nil)
+							So(err, ShouldNotBeNil)
+						})
 					})
 				})
 			})
