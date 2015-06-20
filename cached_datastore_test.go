@@ -56,12 +56,12 @@ func TestCachedDatastore(t *testing.T) {
 				})
 			})
 
-			Convey("Given I have a queryable model without key saved in datastore but not cached", func() {
+			Convey("Given I have a queryable model saved in datastore but not cached", func() {
 				account := &Account{Name: "Borges", Token: "my-auth-token"} // datastore key not resolved
 				appx.Datastore{c}.Create(account)
 				time.Sleep(1 * time.Second) // gives datastore some time to index the data before querying
 
-				Convey("When I load it with CachedDatastore", func() {
+				Convey("When I load it missing its key", func() {
 					accountFromCache := &Account{Token: account.Token}
 					err := appx.NewCachedDatastore(c).Load(accountFromCache)
 
@@ -73,13 +73,8 @@ func TestCachedDatastore(t *testing.T) {
 						})
 					})
 				})
-			})
 
-			Convey("Given I have a queryable model with key set and saved in datastore but not cached", func() {
-				account := &Account{Name: "Borges", Id: 123, Token: "123-123"}
-				appx.Datastore{c}.Create(account)
-
-				Convey("When I load it with CachedDatastore", func() {
+				Convey("When I load it with its key set", func() {
 					accountFromCache := &Account{}
 					accountFromCache.SetKey(account.Key())
 
@@ -208,12 +203,12 @@ func TestCachedDatastore(t *testing.T) {
 		})
 
 		Convey("Delete", func() {
-			Convey("Given I have an entity cached by its key", func() {
+			Convey("Given I have an entity cached by its cache ID", func() {
 				cds := appx.NewCachedDatastore(c)
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				cds.Create(tag)
 
-				Convey("When I delete the entity with CachedDatastore", func() {
+				Convey("When I delete the entity", func() {
 					err := cds.Delete(tag)
 
 					Convey("Then the operation succeeds", func() {
@@ -232,7 +227,7 @@ func TestCachedDatastore(t *testing.T) {
 				})
 			})
 
-			Convey("Given I have a queryable entity cached", func() {
+			Convey("Given I have a queryable entity saved in datastore and cached", func() {
 				cds := appx.NewCachedDatastore(c)
 				account := &Account{Id: 321, Name: "Borges", Token: "my-auth-token"}
 				cds.Create(account)
@@ -242,6 +237,31 @@ func TestCachedDatastore(t *testing.T) {
 					err := cds.Delete(account)
 
 					Convey("Then it successfully deletes the entity", func() {
+						So(err, ShouldBeNil)
+
+						Convey("And the data is deleted from the cache", func() {
+							_, err := memcache.JSON.Get(c, account.CacheID(), nil)
+							So(err, ShouldEqual, memcache.ErrCacheMiss)
+
+							Convey("And the data is deleted from datastore", func() {
+								account.Id = 321
+								err := appx.Datastore{c}.Load(account)
+								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
+							})
+						})
+					})
+				})
+			})
+
+			Convey("Given I have a queryable entity saved in datastore but not cached", func() {
+				account := &Account{Id: 321, Name: "Borges", Token: "my-auth-token"}
+				appx.Datastore{c}.Create(account)
+
+				Convey("When I delete the entity with its key present", func() {
+					account.Token = "" // can no longer by queried on a cache miss
+					err := appx.NewCachedDatastore(c).Delete(account)
+
+					Convey("Then it successfully deletes the entity by its key", func() {
 						So(err, ShouldBeNil)
 
 						Convey("And the data is deleted from the cache", func() {

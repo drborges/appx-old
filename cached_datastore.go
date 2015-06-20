@@ -19,9 +19,6 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	return &CachedDatastore{Datastore{c}}
 }
 
-// TODO any fallback to CacheMissQuery should be avoided in case the given entity
-// already has a key set
-
 func (this CachedDatastore) Load(entity Cacheable) error {
 	queryable, isQueryable := entity.(CacheMissQueryable)
 
@@ -31,7 +28,7 @@ func (this CachedDatastore) Load(entity Cacheable) error {
 		}
 	}
 
-	// TODO check for empty CacheID?
+	needQueryFallback := entity.Key() == nil && isQueryable
 
 	// Workaround to persist the not exported entity's key in the memcache
 	cacheableEntity := &CacheableEntity{entity, entity.Key()}
@@ -40,19 +37,16 @@ func (this CachedDatastore) Load(entity Cacheable) error {
 	if err == memcache.ErrCacheMiss {
 		// Falls back to look up by key
 		// in case the key is present
-		if entity.Key() != nil {
+		if !needQueryFallback {
 			return this.ds.Load(entity)
 		}
 
 		// In case the given cacheable is also queryable,
 		// the data is retrieved by executing the
 		// cache miss query provided by the entity
-		if isQueryable {
+		if needQueryFallback {
 			return this.ds.Query(queryable.CacheMissQuery()).Result(entity)
 		}
-
-		// Looks up the data by datastore key
-		return this.ds.Load(entity)
 	}
 
 	// Sets back the key to the cacheable
@@ -89,13 +83,20 @@ func (this CachedDatastore) Update(cacheable Cacheable) error {
 func (this CachedDatastore) Delete(cacheable Cacheable) error {
 	// Fetches the cacheable key using the provided cache miss query
 	// so it may be deleted from datastore
-	if queryable, ok := cacheable.(CacheMissQueryable); ok {
-		this.ds.Query(queryable.CacheMissQuery()).Result(cacheable)
+	if queryable, ok := cacheable.(CacheMissQueryable); ok && cacheable.Key() == nil {
+		if err := this.ds.Query(queryable.CacheMissQuery()).Result(cacheable); err != nil {
+			return err
+		}
 	}
 
 	if err := this.ds.Delete(cacheable); err != nil {
 		return err
 	}
 
-	return memcache.Delete(this.ds.Context, cacheable.CacheID())
+	// don't really care about cache misses errors
+	if err := memcache.Delete(this.ds.Context, cacheable.CacheID()); err != nil && err != memcache.ErrCacheMiss {
+		return err
+	}
+
+	return nil
 }
