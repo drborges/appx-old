@@ -26,7 +26,7 @@ func NewItemsIterator(q *datastore.Query, c appengine.Context) Iterator {
 func (this *itemsIterator) LoadNext(dst interface{}) error {
 	e, ok := dst.(Entity)
 	if !ok {
-		return datastore.ErrInvalidEntityType
+		return ErrInvalidEntityType
 	}
 
 	iter := this.query.Run(this.context)

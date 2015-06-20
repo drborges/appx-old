@@ -25,13 +25,13 @@ func NewPagesIterator(q *datastore.Query, c appengine.Context) Iterator {
 func (this *pageIterator) LoadNext(slice interface{}) error {
 	sv := reflect.ValueOf(slice)
 	if sv.Kind() != reflect.Ptr || sv.IsNil() || sv.Elem().Kind() != reflect.Slice {
-		return datastore.ErrInvalidEntityType
+		return ErrInvalidSliceType
 	}
 	sv = sv.Elem()
 
 	elemType := sv.Type().Elem()
 	if elemType.Kind() != reflect.Ptr || elemType.Elem().Kind() != reflect.Struct {
-		return datastore.ErrInvalidEntityType
+		return ErrInvalidEntityType
 	}
 
 	this.started = true
@@ -42,7 +42,7 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 
 		entity, ok := dst.(Entity)
 		if !ok {
-			return datastore.ErrInvalidEntityType
+			return ErrInvalidEntityType
 		}
 
 		key, err := iter.Next(entity)
