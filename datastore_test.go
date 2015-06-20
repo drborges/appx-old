@@ -8,64 +8,6 @@ import (
 	"testing"
 )
 
-type Tag struct {
-	appx.Model
-	Name  string
-	Owner string
-}
-
-func (this Tag) KeyMetadata() *appx.KeyMetadata {
-	return &appx.KeyMetadata{
-		Kind:     "Tags",
-		StringID: this.Name,
-	}
-}
-
-func (this Tag) CacheID() string {
-	return this.Name
-}
-
-type Post struct {
-	appx.Model
-	Description string
-}
-
-func (this Post) KeyMetadata() *appx.KeyMetadata {
-	return &appx.KeyMetadata{
-		Kind: "Posts",
-	}
-}
-
-type Account struct {
-	appx.Model
-	Id    int64
-	Token string
-	Name  string
-}
-
-func (this Account) CacheID() string {
-	return this.Token
-}
-
-func (this Account) CacheMissQuery() *datastore.Query {
-	return datastore.NewQuery(this.KeyMetadata().Kind).Filter("Token=", this.Token).Limit(1)
-}
-
-func (this Account) KeyMetadata() *appx.KeyMetadata {
-	return &appx.KeyMetadata{
-		Kind:  "Accounts",
-		IntID: this.Id,
-	}
-}
-
-type ModelMissingKind struct {
-	appx.Model
-}
-
-func (this ModelMissingKind) KeyMetadata() *appx.KeyMetadata {
-	return &appx.KeyMetadata{}
-}
-
 func TestLoadModel(t *testing.T) {
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()

@@ -8,18 +8,6 @@ import (
 	"testing"
 )
 
-type Comment struct {
-	appx.Model
-	Content string
-}
-
-func (this Comment) KeyMetadata() *appx.KeyMetadata {
-	return &appx.KeyMetadata{
-		Kind:      "Comments",
-		HasParent: true,
-	}
-}
-
 func TestKeyMetadata(t *testing.T) {
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
