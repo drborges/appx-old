@@ -13,6 +13,7 @@ func (this Model) Key() *datastore.Key {
 
 func (this *Model) SetKey(key *datastore.Key) {
 	this.key = key
+	this.parentKey = key.Parent()
 }
 
 func (this Model) ParentKey() *datastore.Key {

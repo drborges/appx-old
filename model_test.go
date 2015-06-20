@@ -17,6 +17,14 @@ func TestModel(t *testing.T) {
 			commentKey := datastore.NewKey(c, "Comments", "", 0, parentKey)
 			comment := Comment{}
 
+			Convey("When I set its Key", func() {
+				comment.SetKey(commentKey)
+
+				Convey("Then its parent key is set", func() {
+					So(comment.ParentKey(), ShouldResemble, parentKey)
+				})
+			})
+
 			Convey("When I set its ID", func() {
 				err := comment.SetID(commentKey.Encode())
 
