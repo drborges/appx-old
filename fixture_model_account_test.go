@@ -19,7 +19,7 @@ type Account struct {
 // An Account is saved under the kind "Accounts" as defined below
 // and it is defined to use its id field in the IntID component of
 // the datastore key
-func (this Account) KeyMetadata() *appx.KeyMetadata {
+func (this *Account) KeyMetadata() *appx.KeyMetadata {
 	return &appx.KeyMetadata{
 		Kind:  "Accounts",
 		IntID: this.Id,
@@ -28,13 +28,13 @@ func (this Account) KeyMetadata() *appx.KeyMetadata {
 
 // CacheID implements appx.Cacheable interface which makes
 // an Account compatible with appx.CachedDatastore
-func (this Account) CacheID() string {
+func (this *Account) CacheID() string {
 	return this.Token
 }
 
 // CacheMissQuery implements appx.CacheMissQueryable interface
 // allowing appx.CachedDatastore to fall back to the provided query
 // when fetching data from datastore in case of a cache miss
-func (this Account) CacheMissQuery() *datastore.Query {
-	return datastore.NewQuery(this.KeyMetadata().Kind).Filter("Token=", this.Token).Limit(1)
+func (this *Account) CacheMissQuery() *datastore.Query {
+	return appx.From(this).Filter("Token=", this.Token).Limit(1)
 }

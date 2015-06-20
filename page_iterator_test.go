@@ -23,7 +23,7 @@ func TestPagesIterator(t *testing.T) {
 
 	Convey("PagesIterator", t, func() {
 		Convey("Given I have a pages iterator with 2 pages each with 2 items", func() {
-			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(2)
+			q := appx.From(&Tag{}).Limit(2)
 			iter := appx.NewDatastore(c).Query(q).PagesIterator()
 
 			Convey("Then I can load the first page", func() {
@@ -52,7 +52,7 @@ func TestPagesIterator(t *testing.T) {
 		})
 
 		Convey("Given I have a pages iterator with 4 pages each with 1 item", func() {
-			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(1)
+			q := appx.From(&Tag{}).Limit(1)
 			iter := appx.NewDatastore(c).Query(q).PagesIterator()
 
 			Convey("Then I can load pages until iterator has no more pages", func() {
@@ -73,7 +73,7 @@ func TestPagesIterator(t *testing.T) {
 		})
 
 		Convey("Given I have a pages iterator with cursor starting from the second and last page", func() {
-			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Limit(2)
+			q := appx.From(&Tag{}).Limit(2)
 			firstPage := &[]*Tag{}
 			prevIter := appx.NewDatastore(c).Query(q).PagesIterator()
 			prevIter.LoadNext(firstPage)
@@ -98,7 +98,7 @@ func TestPagesIterator(t *testing.T) {
 		})
 
 		Convey("Given I have a pages iterator with zero items", func() {
-			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "non existent").Limit(1)
+			q := appx.From(&Tag{}).Filter("Owner=", "non existent").Limit(1)
 			iter := appx.NewDatastore(c).Query(q).PagesIterator()
 
 			Convey("When I load the next page", func() {

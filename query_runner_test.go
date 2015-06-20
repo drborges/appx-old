@@ -31,7 +31,7 @@ func TestQueryRunner(t *testing.T) {
 	createAll(c, golang, swift, ruby)
 
 	Convey("Given I have a QueryRunner", t, func() {
-		q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges")
+		q := appx.From(&Tag{}).Filter("Owner=", "Borges")
 		runner := appx.NewQueryRunner(c, q)
 
 		Convey("When I run Results", func() {
