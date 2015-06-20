@@ -2,12 +2,12 @@ package appx_test
 
 import (
 	"appengine/aetest"
+	"appengine/datastore"
+	"appengine/memcache"
 	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"appengine/memcache"
 	"time"
-	"appengine/datastore"
 )
 
 func TestCachedDatastore(t *testing.T) {
@@ -20,12 +20,12 @@ func TestCachedDatastore(t *testing.T) {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				appx.ResolveKey(c, tag)
 				memcache.JSON.Set(c, &memcache.Item{
-					Key: tag.CacheID(),
+					Key:    tag.CacheID(),
 					Object: appx.CacheableEntity{tag, tag.Key()}},
 				)
 
 				Convey("When I load it with CachedDatastore", func() {
-					tagFromCache := &Tag{Name:tag.Name}
+					tagFromCache := &Tag{Name: tag.Name}
 					err := appx.NewCachedDatastore(c).Load(tagFromCache)
 
 					Convey("Then it succeeds", func() {
@@ -117,7 +117,7 @@ func TestCachedDatastore(t *testing.T) {
 				appx.ResolveKey(c, tag)
 
 				memcache.JSON.Set(c, &memcache.Item{
-					Key: tag.CacheID(),
+					Key:    tag.CacheID(),
 					Object: appx.CacheableEntity{tag, tag.Key()},
 				})
 

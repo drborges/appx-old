@@ -2,9 +2,9 @@ package appx_test
 
 import (
 	"appengine/aetest"
+	"appengine/datastore"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"appengine/datastore"
 )
 
 func TestModel(t *testing.T) {

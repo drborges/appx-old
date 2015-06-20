@@ -1,11 +1,11 @@
 package appx_test
 
 import (
+	"appengine/aetest"
+	"appengine/datastore"
+	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"appengine/aetest"
-	"github.com/drborges/appx"
-	"appengine/datastore"
 )
 
 func TestPagesIterator(t *testing.T) {

@@ -67,4 +67,3 @@ func (this *itemsIterator) HasNext() bool {
 func (this *itemsIterator) Cursor() string {
 	return this.nextCursor.String()
 }
-

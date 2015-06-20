@@ -1,12 +1,12 @@
 package appx_test
 
 import (
+	"appengine"
 	"appengine/aetest"
 	"appengine/datastore"
 	"github.com/drborges/appx"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
-	"appengine"
 	"time"
 )
 
@@ -82,4 +82,3 @@ func TestQueryRunner(t *testing.T) {
 		})
 	})
 }
-

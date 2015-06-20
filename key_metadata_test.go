@@ -15,7 +15,7 @@ type Comment struct {
 
 func (this Comment) KeyMetadata() *appx.KeyMetadata {
 	return &appx.KeyMetadata{
-		Kind: "Comments",
+		Kind:      "Comments",
 		HasParent: true,
 	}
 }

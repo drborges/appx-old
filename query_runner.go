@@ -39,4 +39,3 @@ func (this QueryRunner) ItemsIterator() Iterator {
 func (this QueryRunner) PagesIterator() Iterator {
 	return NewPagesIterator(this.query, this.context)
 }
-
