@@ -22,11 +22,11 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 // TODO any fallback to CacheMissQuery should be avoided in case the given entity
 // already has a key set
 
-func (this CachedDatastore) Load(cacheable Cacheable) error {
-	queryable, implementsQueryable := cacheable.(CacheMissQueryable)
+func (this CachedDatastore) Load(entity Cacheable) error {
+	queryable, isQueryable := entity.(CacheMissQueryable)
 
-	if !implementsQueryable {
-		if err := ResolveKey(this.ds.Context, cacheable); err != nil {
+	if !isQueryable {
+		if err := ResolveKey(this.ds.Context, entity); err != nil {
 			return err
 		}
 	}
@@ -34,23 +34,29 @@ func (this CachedDatastore) Load(cacheable Cacheable) error {
 	// TODO check for empty CacheID?
 
 	// Workaround to persist the not exported entity's key in the memcache
-	cacheableEntity := &CacheableEntity{cacheable, cacheable.Key()}
-	_, err := memcache.JSON.Get(this.ds.Context, cacheable.CacheID(), cacheableEntity)
+	cacheableEntity := &CacheableEntity{entity, entity.Key()}
+	_, err := memcache.JSON.Get(this.ds.Context, entity.CacheID(), cacheableEntity)
 
 	if err == memcache.ErrCacheMiss {
-		// In case the given cacheable is also a queryable,
-		// the data is retrieved by executing the query
-		// provided by the queryable
-		if implementsQueryable {
-			return this.ds.Query(queryable.CacheMissQuery()).Result(cacheable)
+		// Falls back to look up by key
+		// in case the key is present
+		if entity.Key() != nil {
+			return this.ds.Load(entity)
+		}
+
+		// In case the given cacheable is also queryable,
+		// the data is retrieved by executing the
+		// cache miss query provided by the entity
+		if isQueryable {
+			return this.ds.Query(queryable.CacheMissQuery()).Result(entity)
 		}
 
 		// Looks up the data by datastore key
-		return this.ds.Load(cacheable)
+		return this.ds.Load(entity)
 	}
 
 	// Sets back the key to the cacheable
-	cacheable.SetKey(cacheableEntity.Key)
+	entity.SetKey(cacheableEntity.Key)
 	return err
 }
 
@@ -81,15 +87,15 @@ func (this CachedDatastore) Update(cacheable Cacheable) error {
 }
 
 func (this CachedDatastore) Delete(cacheable Cacheable) error {
-	if err := memcache.Delete(this.ds.Context, cacheable.CacheID()); err != nil {
-		return err
-	}
-
 	// Fetches the cacheable key using the provided cache miss query
 	// so it may be deleted from datastore
 	if queryable, ok := cacheable.(CacheMissQueryable); ok {
 		this.ds.Query(queryable.CacheMissQuery()).Result(cacheable)
 	}
 
-	return this.ds.Delete(cacheable)
+	if err := this.ds.Delete(cacheable); err != nil {
+		return err
+	}
+
+	return memcache.Delete(this.ds.Context, cacheable.CacheID())
 }

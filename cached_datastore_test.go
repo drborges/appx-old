@@ -56,7 +56,7 @@ func TestCachedDatastore(t *testing.T) {
 				})
 			})
 
-			Convey("Given I have a not cached queryable model in datastore", func() {
+			Convey("Given I have a queryable model without key saved in datastore but not cached", func() {
 				account := &Account{Name: "Borges", Token: "my-auth-token"} // datastore key not resolved
 				appx.Datastore{c}.Create(account)
 				time.Sleep(1 * time.Second) // gives datastore some time to index the data before querying
@@ -66,6 +66,26 @@ func TestCachedDatastore(t *testing.T) {
 					err := appx.NewCachedDatastore(c).Load(accountFromCache)
 
 					Convey("Then it successfully falls back to the provided CacheMissQuery", func() {
+						So(err, ShouldBeNil)
+
+						Convey("Then it loads the model's data", func() {
+							So(accountFromCache, ShouldResemble, account)
+						})
+					})
+				})
+			})
+
+			Convey("Given I have a queryable model with key set and saved in datastore but not cached", func() {
+				account := &Account{Name: "Borges", Id: 123, Token: "123-123"}
+				appx.Datastore{c}.Create(account)
+
+				Convey("When I load it with CachedDatastore", func() {
+					accountFromCache := &Account{}
+					accountFromCache.SetKey(account.Key())
+
+					err := appx.NewCachedDatastore(c).Load(accountFromCache)
+
+					Convey("Then it successfully falls back to look up by key", func() {
 						So(err, ShouldBeNil)
 
 						Convey("Then it loads the model's data", func() {
