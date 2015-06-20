@@ -278,5 +278,43 @@ func TestCachedDatastore(t *testing.T) {
 				})
 			})
 		})
+
+		Convey("CreateAll", func() {
+			Convey("Given I have a slice of entities", func() {
+				account1 := &Account{Id: 123, Name: "Borges", Token: "borges-auth-token"}
+				account2 := &Account{Id: 321, Name: "Diego", Token: "diego-auth-token"}
+				accounts := []*Account{account1, account2}
+
+				Convey("When I create them all", func() {
+					err := appx.NewCachedDatastore(c).CreateAll(accounts)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+
+						Convey("And the data is stored in the cache", func() {
+							// Accounts are cached using their Token field as cache ID
+							// See Account implementation for more detailed information
+							account1FromCache := &Account{Token: account1.Token}
+							account2FromCache := &Account{Token: account2.Token}
+							appx.NewCachedDatastore(c).Load(account1FromCache)
+							appx.NewCachedDatastore(c).Load(account2FromCache)
+
+							So(account1FromCache, ShouldResemble, account1)
+							So(account2FromCache, ShouldResemble, account2)
+
+							Convey("And the data is stored in datastore", func() {
+								account1FromDatastore := &Account{Id: account1.Id}
+								account2FromDatastore := &Account{Id: account2.Id}
+								appx.NewDatastore(c).Load(account1FromDatastore)
+								appx.NewDatastore(c).Load(account2FromDatastore)
+
+								So(account1FromDatastore, ShouldResemble, account1)
+								So(account2FromDatastore, ShouldResemble, account2)
+							})
+						})
+					})
+				})
+			})
+		})
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/memcache"
+	"reflect"
 )
 
 type CacheableEntity struct {
@@ -65,6 +66,34 @@ func (this CachedDatastore) Create(cacheable Cacheable) error {
 		Key:    cacheable.CacheID(),
 		Object: CacheableEntity{cacheable, cacheable.Key()},
 	})
+}
+
+func (this CachedDatastore) CreateAll(slice interface{}) error {
+	// Creates all entities in datastore first so in case of
+	// error no data would be cached
+	if err := this.ds.CreateAll(slice); err != nil {
+		return err
+	}
+
+	// At this point we are safe to assume
+	// slice is actually a slice since otherwise
+	// this.ds.CreateAll would return an error
+	s := reflect.ValueOf(slice)
+
+	// Create a memcache.Item for each cacheable
+	// in the given slice
+	items := make([]*memcache.Item, s.Len())
+	for i := 0; i < s.Len(); i++ {
+		cacheable := s.Index(i).Interface().(Cacheable)
+		items[i] = &memcache.Item{
+			Key:    cacheable.CacheID(),
+			Object: CacheableEntity{cacheable, cacheable.Key()},
+		}
+	}
+
+	// Saves the cacheable as an entity with the key set
+	// to an exported field so it may also be saved
+	return memcache.JSON.SetMulti(this.ds.context, items)
 }
 
 func (this CachedDatastore) Update(cacheable Cacheable) error {
