@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestLoadModel(t *testing.T) {
+func TestDatastore(t *testing.T) {
 	c, _ := aetest.NewContext(nil)
 	defer c.Close()
 
@@ -221,7 +221,7 @@ func TestLoadModel(t *testing.T) {
 				post3 := &Post{Description: "Post 3"}
 				posts := []*Post{post1, post2, post3}
 
-				Convey("When I create all", func() {
+				Convey("When I create all models in a slice", func() {
 					err := appx.NewDatastore(c).CreateAll(posts)
 
 					Convey("Then it succeeds", func() {

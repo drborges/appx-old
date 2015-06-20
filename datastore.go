@@ -74,7 +74,7 @@ func (this *Datastore) CreateAll(slice interface{}) error {
 	s := reflect.ValueOf(slice)
 
 	if s.Kind() != reflect.Slice {
-		return datastore.ErrInvalidEntityType
+		return ErrInvalidSliceType
 	}
 
 	keys := make([]*datastore.Key, s.Len())
