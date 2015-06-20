@@ -4,8 +4,8 @@ import "appengine/datastore"
 
 type Resource interface {
 	Entity
-	ID() string
-	SetID(string) error
+	ResourceID() string
+	SetResourceID(string) error
 }
 
 type Entity interface {

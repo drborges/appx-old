@@ -26,7 +26,7 @@ func TestModel(t *testing.T) {
 			})
 
 			Convey("When I set its ID", func() {
-				err := comment.SetID(commentKey.Encode())
+				err := comment.SetResourceID(commentKey.Encode())
 
 				Convey("Then it succeeds", func() {
 					So(err, ShouldBeNil)
