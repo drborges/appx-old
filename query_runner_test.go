@@ -32,7 +32,7 @@ func TestQueryRunner(t *testing.T) {
 
 	Convey("Given I have a QueryRunner", t, func() {
 		q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges")
-		runner := appx.QueryRunner{c, q}
+		runner := appx.NewQueryRunner(c, q)
 
 		Convey("When I run Results", func() {
 			result := []*Tag{}

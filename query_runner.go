@@ -6,12 +6,16 @@ import (
 )
 
 type QueryRunner struct {
-	Context appengine.Context
-	Query   *datastore.Query
+	context appengine.Context
+	query   *datastore.Query
+}
+
+func NewQueryRunner(c appengine.Context, q *datastore.Query) *QueryRunner {
+	return &QueryRunner{c, q}
 }
 
 func (this QueryRunner) Count() (int, error) {
-	return this.Query.Count(this.Context)
+	return this.query.Count(this.context)
 }
 
 func (this QueryRunner) Results(slice interface{}) error {
@@ -24,15 +28,15 @@ func (this QueryRunner) Result(e Entity) error {
 
 func (this QueryRunner) StartFrom(cursor string) QueryRunner {
 	c, _ := datastore.DecodeCursor(cursor)
-	this.Query = this.Query.Start(c)
+	this.query = this.query.Start(c)
 	return this
 }
 
 func (this QueryRunner) ItemsIterator() Iterator {
-	return NewItemsIterator(this.Query, this.Context)
+	return NewItemsIterator(this.query, this.context)
 }
 
 func (this QueryRunner) PagesIterator() Iterator {
-	return NewPagesIterator(this.Query, this.Context)
+	return NewPagesIterator(this.query, this.context)
 }
 
