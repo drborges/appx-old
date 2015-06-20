@@ -23,7 +23,7 @@ func (this CachedDatastore) Load(entity Cacheable) error {
 	queryable, isQueryable := entity.(CacheMissQueryable)
 
 	if !isQueryable {
-		if err := ResolveKey(this.ds.Context, entity); err != nil {
+		if err := ResolveKey(this.ds.context, entity); err != nil {
 			return err
 		}
 	}
@@ -32,7 +32,7 @@ func (this CachedDatastore) Load(entity Cacheable) error {
 
 	// Workaround to persist the not exported entity's key in the memcache
 	cacheableEntity := &CacheableEntity{entity, entity.Key()}
-	_, err := memcache.JSON.Get(this.ds.Context, entity.CacheID(), cacheableEntity)
+	_, err := memcache.JSON.Get(this.ds.context, entity.CacheID(), cacheableEntity)
 
 	if err == memcache.ErrCacheMiss {
 		// Falls back to look up by key
@@ -61,7 +61,7 @@ func (this CachedDatastore) Create(cacheable Cacheable) error {
 
 	// Saves the cacheable as an entity with the key set
 	// to an exported field so it may also be saved
-	return memcache.JSON.Set(this.ds.Context, &memcache.Item{
+	return memcache.JSON.Set(this.ds.context, &memcache.Item{
 		Key:    cacheable.CacheID(),
 		Object: CacheableEntity{cacheable, cacheable.Key()},
 	})
@@ -74,7 +74,7 @@ func (this CachedDatastore) Update(cacheable Cacheable) error {
 
 	// Saves the cacheable as an entity with the key set
 	// to an exported field so it may also be saved
-	return memcache.JSON.Set(this.ds.Context, &memcache.Item{
+	return memcache.JSON.Set(this.ds.context, &memcache.Item{
 		Key:    cacheable.CacheID(),
 		Object: CacheableEntity{cacheable, cacheable.Key()},
 	})
@@ -94,7 +94,7 @@ func (this CachedDatastore) Delete(cacheable Cacheable) error {
 	}
 
 	// don't really care about cache misses errors
-	if err := memcache.Delete(this.ds.Context, cacheable.CacheID()); err != nil && err != memcache.ErrCacheMiss {
+	if err := memcache.Delete(this.ds.context, cacheable.CacheID()); err != nil && err != memcache.ErrCacheMiss {
 		return err
 	}
 

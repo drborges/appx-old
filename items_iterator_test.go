@@ -24,7 +24,7 @@ func TestItemsIterator(t *testing.T) {
 	Convey("ItemsIterator", t, func() {
 		Convey("Given I have an items iterator with 3 pages each with 1 item", func() {
 			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "Borges").Limit(1)
-			iter := appx.Datastore{c}.Query(q).ItemsIterator()
+			iter := appx.NewDatastore(c).Query(q).ItemsIterator()
 			tagsFromIterator := []*Tag{&Tag{}, &Tag{}, &Tag{}}
 
 			Convey("Then I can load the first item", func() {
@@ -56,7 +56,7 @@ func TestItemsIterator(t *testing.T) {
 				})
 
 				Convey("I can create a new iterator using the cursor from the previous one", func() {
-					iterWithCursor := appx.Datastore{c}.Query(q).StartFrom(iter.Cursor()).ItemsIterator()
+					iterWithCursor := appx.NewDatastore(c).Query(q).StartFrom(iter.Cursor()).ItemsIterator()
 
 					Convey("I can load the second item", func() {
 						So(iterWithCursor.LoadNext(tagsFromIterator[1]), ShouldBeNil)
@@ -85,7 +85,7 @@ func TestItemsIterator(t *testing.T) {
 
 		Convey("Given I have an items iterator with zero items", func() {
 			q := datastore.NewQuery(Tag{}.KeyMetadata().Kind).Filter("Owner=", "non existent").Limit(1)
-			iter := appx.Datastore{c}.Query(q).ItemsIterator()
+			iter := appx.NewDatastore(c).Query(q).ItemsIterator()
 
 			Convey("When I load the next item", func() {
 				firstItem := Tag{}

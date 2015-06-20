@@ -40,7 +40,7 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a not cached model in datastore", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
-				appx.Datastore{c}.Create(tag)
+				appx.NewDatastore(c).Create(tag)
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name: tag.Name}
@@ -58,7 +58,7 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a queryable model saved in datastore but not cached", func() {
 				account := &Account{Name: "Borges", Token: "my-auth-token"} // datastore key not resolved
-				appx.Datastore{c}.Create(account)
+				appx.NewDatastore(c).Create(account)
 				time.Sleep(1 * time.Second) // gives datastore some time to index the data before querying
 
 				Convey("When I load it missing its key", func() {
@@ -162,7 +162,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And datastore information is updated", func() {
 								tagFromDatastore := &Tag{Name: tag.Name}
-								appx.Datastore{c}.Load(tagFromDatastore)
+								appx.NewDatastore(c).Load(tagFromDatastore)
 
 								So(tagFromDatastore, ShouldResemble, tag)
 							})
@@ -192,7 +192,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And datastore information is updated", func() {
 								accountFromDatastore := &Account{Id: 12}
-								appx.Datastore{c}.Load(accountFromDatastore)
+								appx.NewDatastore(c).Load(accountFromDatastore)
 
 								So(accountFromDatastore, ShouldResemble, account)
 							})
@@ -219,7 +219,7 @@ func TestCachedDatastore(t *testing.T) {
 							So(err, ShouldEqual, memcache.ErrCacheMiss)
 
 							Convey("And the data is deleted from datastore", func() {
-								err := appx.Datastore{c}.Load(tag)
+								err := appx.NewDatastore(c).Load(tag)
 								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 							})
 						})
@@ -245,7 +245,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And the data is deleted from datastore", func() {
 								account.Id = 321
-								err := appx.Datastore{c}.Load(account)
+								err := appx.NewDatastore(c).Load(account)
 								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 							})
 						})
@@ -255,7 +255,7 @@ func TestCachedDatastore(t *testing.T) {
 
 			Convey("Given I have a queryable entity saved in datastore but not cached", func() {
 				account := &Account{Id: 321, Name: "Borges", Token: "my-auth-token"}
-				appx.Datastore{c}.Create(account)
+				appx.NewDatastore(c).Create(account)
 
 				Convey("When I delete the entity with its key present", func() {
 					account.Token = "" // can no longer by queried on a cache miss
@@ -270,7 +270,7 @@ func TestCachedDatastore(t *testing.T) {
 
 							Convey("And the data is deleted from datastore", func() {
 								account.Id = 321
-								err := appx.Datastore{c}.Load(account)
+								err := appx.NewDatastore(c).Load(account)
 								So(err, ShouldEqual, datastore.ErrNoSuchEntity)
 							})
 						})
