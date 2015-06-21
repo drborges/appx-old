@@ -5,6 +5,7 @@ import (
 	"appengine/datastore"
 	"appengine/memcache"
 	"reflect"
+	"encoding/json"
 )
 
 type CacheableEntity struct {
@@ -20,7 +21,7 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	return &CachedDatastore{Datastore{c}}
 }
 
-func (this CachedDatastore) Load(entity Cacheable) error {
+func (this *CachedDatastore) Load(entity Cacheable) error {
 	queryable, isQueryable := entity.(CacheMissQueryable)
 
 	if !isQueryable {
@@ -55,7 +56,7 @@ func (this CachedDatastore) Load(entity Cacheable) error {
 	return err
 }
 
-func (this CachedDatastore) Create(cacheable Cacheable) error {
+func (this *CachedDatastore) Create(cacheable Cacheable) error {
 	if err := this.ds.Create(cacheable); err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (this CachedDatastore) Create(cacheable Cacheable) error {
 	})
 }
 
-func (this CachedDatastore) CreateAll(slice interface{}) error {
+func (this *CachedDatastore) CreateAll(slice interface{}) error {
 	// Creates all entities in datastore first so in case of
 	// error no data would be cached
 	if err := this.ds.CreateAll(slice); err != nil {
@@ -96,7 +97,68 @@ func (this CachedDatastore) CreateAll(slice interface{}) error {
 	return memcache.JSON.SetMulti(this.ds.context, items)
 }
 
-func (this CachedDatastore) Update(cacheable Cacheable) error {
+func (this *CachedDatastore) LoadAll(slice interface{}) error {
+	s := reflect.ValueOf(slice)
+
+	if s.Kind() != reflect.Slice {
+		return datastore.ErrInvalidEntityType
+	}
+
+	// Creates a slice of cache keys and
+	// makes sure every entity in the given
+	// slice is appx.Cacheable
+	cacheKeys := make([]string, s.Len())
+	for i, _ := range cacheKeys {
+		cacheable, ok := s.Index(i).Interface().(Cacheable)
+		if !ok {
+			return ErrNonCacheableEntity
+		}
+		cacheKeys[i] = cacheable.CacheID()
+	}
+
+	items, err := memcache.GetMulti(this.ds.context, cacheKeys)
+	// TODO might need to handle ErrCacheMiss
+	if err != nil {
+		return err
+	}
+
+	// Falls back to datastore batch load
+	// in case no entity is cached
+	if len(items) == 0 {
+		return this.ds.LoadAll(slice)
+	}
+
+	for i := 0; i < s.Len(); i++ {
+		entity := s.Index(i).Interface().(Cacheable)
+		// At this point we are safe to assume the entity
+		// implements appx.Cacheable since it was already
+		// verified while creating the slice of cache keys
+		cacheID := entity.CacheID()
+		item, itemCached := items[cacheID]
+
+		if !itemCached {
+			// Falls back to datastore
+			if err := this.Load(entity); err == datastore.ErrNoSuchEntity {
+				// TODO handle partial loads = not in cache nor datastore
+				// return error with the failed entity's index? so the user
+				// may decide whether to remove the entity from the list or not?
+				return err
+			}
+		} else {
+			// "Reassemble cacheable from the CacheableEntity
+			// stored in the cache Item object
+			cacheableEntity := CacheableEntity{Cacheable: entity}
+			if err := json.Unmarshal(item.Value, &cacheableEntity); err != nil {
+				return err
+			}
+			entity.SetKey(cacheableEntity.Key)
+		}
+	}
+
+	return nil
+}
+
+func (this *CachedDatastore) Update(cacheable Cacheable) error {
 	if err := this.ds.Update(cacheable); err != nil {
 		return err
 	}
@@ -109,7 +171,7 @@ func (this CachedDatastore) Update(cacheable Cacheable) error {
 	})
 }
 
-func (this CachedDatastore) Delete(cacheable Cacheable) error {
+func (this *CachedDatastore) Delete(cacheable Cacheable) error {
 	// Fetches the cacheable key using the provided cache miss query
 	// so it may be deleted from datastore
 	if queryable, ok := cacheable.(CacheMissQueryable); ok && cacheable.Key() == nil {
@@ -128,4 +190,8 @@ func (this CachedDatastore) Delete(cacheable Cacheable) error {
 	}
 
 	return nil
+}
+
+func (this *CachedDatastore) Query(q *datastore.Query) *QueryRunner {
+	return this.ds.Query(q)
 }

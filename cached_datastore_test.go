@@ -316,5 +316,85 @@ func TestCachedDatastore(t *testing.T) {
 				})
 			})
 		})
+
+		Convey("LoadAll", func() {
+
+			Convey("Given I have a few not cached entities in datastore", func() {
+				tag1 := &Tag{Name:"golang", Owner: "Borges"}
+				tag2 := &Tag{Name:"swift", Owner: "Borges"}
+				tags := []*Tag{tag1, tag2}
+				appx.NewDatastore(c).CreateAll(tags)
+
+				Convey("When I load them all with CachedDatastore", func() {
+					tag1FromCache := &Tag{Name: "golang"}
+					tag2FromCache := &Tag{Name: "swift"}
+					tagsFromCache := []*Tag{tag1FromCache, tag2FromCache}
+					err := appx.NewCachedDatastore(c).LoadAll(tagsFromCache)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+
+						Convey("And the data is entirely loaded from datastore", func() {
+							So(tags, ShouldResemble, tagsFromCache)
+						})
+					})
+				})
+			})
+
+			Convey("Given I have a few cached entities (not present in datastore)", func() {
+				tag1 := &Tag{Name:"golang", Owner: "Borges"}
+				tag2 := &Tag{Name:"swift", Owner: "Borges"}
+				tags := []*Tag{tag1, tag2}
+				appx.ResolveKey(c, tag1)
+				appx.ResolveKey(c, tag2)
+
+				memcache.JSON.Set(c, &memcache.Item{
+					Key:    tag1.CacheID(),
+					Object: appx.CacheableEntity{tag1, tag1.Key()},
+				})
+
+				memcache.JSON.Set(c, &memcache.Item{
+					Key:    tag2.CacheID(),
+					Object: appx.CacheableEntity{tag2, tag2.Key()},
+				})
+
+				Convey("And one not cached entity in datastore", func() {
+					tag3 := &Tag{Name: "scala", Owner: "Borges"}
+					tags = append(tags, tag3)
+					appx.NewDatastore(c).Create(tag3)
+
+					Convey("When I load them all with CachedDatastore", func() {
+						tag1FromCache := &Tag{Name: "golang"}
+						tag2FromCache := &Tag{Name: "swift"}
+						tag3FromCache := &Tag{Name: "scala"}
+						tagsFromCache := []*Tag{tag1FromCache, tag2FromCache, tag3FromCache}
+						err := appx.NewCachedDatastore(c).LoadAll(tagsFromCache)
+
+						Convey("Then the operation succeeds", func() {
+							So(err, ShouldBeNil)
+
+							Convey("And the data is loaded from the cache as well as from datastore", func() {
+								So(tags, ShouldResemble, tagsFromCache)
+							})
+						})
+					})
+				})
+
+				Convey("When I load them all with CachedDatastore", func() {
+					tag1FromCache := &Tag{Name: "golang"}
+					tag2FromCache := &Tag{Name: "swift"}
+					tagsFromCache := []*Tag{tag1FromCache, tag2FromCache}
+					err := appx.NewCachedDatastore(c).LoadAll(tagsFromCache)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+
+						Convey("And the data is loaded from the cache", func() {
+							So(tags, ShouldResemble, tagsFromCache)
+						})
+					})
+				})
+			})
+		})
 	})
 }
