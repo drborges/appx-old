@@ -14,7 +14,7 @@ func createAll(c appengine.Context, tags ...*Tag) {
 	keys := make([]*datastore.Key, len(tags))
 	for i, tag := range tags {
 		appx.ResolveKey(c, tag)
-		keys[i] = tag.Key()
+		keys[i] = tag.EntityKey()
 	}
 	datastore.PutMulti(c, keys, tags)
 	time.Sleep(1 * time.Second)
@@ -45,8 +45,8 @@ func TestQueryRunner(t *testing.T) {
 					So(result, ShouldResemble, []*Tag{golang, swift})
 
 					Convey("Then it sets keys back to the entities", func() {
-						So(result[0].Key(), ShouldNotBeNil)
-						So(result[1].Key(), ShouldNotBeNil)
+						So(result[0].EntityKey(), ShouldNotBeNil)
+						So(result[1].EntityKey(), ShouldNotBeNil)
 					})
 				})
 			})
@@ -63,7 +63,7 @@ func TestQueryRunner(t *testing.T) {
 					So(tag, ShouldResemble, golang)
 
 					Convey("Then it sets the key back to the entity", func() {
-						So(tag.Key(), ShouldNotBeNil)
+						So(tag.EntityKey(), ShouldNotBeNil)
 					})
 				})
 			})

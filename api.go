@@ -9,10 +9,10 @@ type Resource interface {
 }
 
 type Entity interface {
-	Key() *datastore.Key
-	SetKey(*datastore.Key)
-	ParentKey() *datastore.Key
-	SetParentKey(*datastore.Key)
+	EntityKey() *datastore.Key
+	SetEntityKey(*datastore.Key)
+	EntityParentKey() *datastore.Key
+	SetEntityParentKey(*datastore.Key)
 }
 
 type Persistable interface {

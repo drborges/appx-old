@@ -56,7 +56,7 @@ func (this *itemsIterator) LoadNext(dst interface{}) error {
 		return this.LoadNext(e)
 	}
 
-	e.SetKey(key)
+	e.SetEntityKey(key)
 	return nil
 }
 

@@ -18,10 +18,10 @@ func TestModel(t *testing.T) {
 			comment := Comment{}
 
 			Convey("When I set its Key", func() {
-				comment.SetKey(commentKey)
+				comment.SetEntityKey(commentKey)
 
 				Convey("Then its parent key is set", func() {
-					So(comment.ParentKey(), ShouldResemble, parentKey)
+					So(comment.EntityParentKey(), ShouldResemble, parentKey)
 				})
 			})
 
@@ -32,10 +32,10 @@ func TestModel(t *testing.T) {
 					So(err, ShouldBeNil)
 
 					Convey("Then its key is set", func() {
-						So(comment.Key(), ShouldResemble, commentKey)
+						So(comment.EntityKey(), ShouldResemble, commentKey)
 
 						Convey("Then its parent key is set", func() {
-							So(comment.ParentKey(), ShouldResemble, parentKey)
+							So(comment.EntityParentKey(), ShouldResemble, parentKey)
 						})
 					})
 				})

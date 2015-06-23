@@ -66,7 +66,7 @@ func (this *pageIterator) LoadNext(slice interface{}) error {
 			return err
 		}
 
-		entity.SetKey(key)
+		entity.SetEntityKey(key)
 		sv.Set(reflect.Append(sv, dstValue))
 	}
 

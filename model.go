@@ -7,25 +7,25 @@ type Model struct {
 	parentKey *datastore.Key `datastore:"-"`
 }
 
-func (this Model) Key() *datastore.Key {
+func (this Model) EntityKey() *datastore.Key {
 	return this.key
 }
 
-func (this *Model) SetKey(key *datastore.Key) {
+func (this *Model) SetEntityKey(key *datastore.Key) {
 	this.key = key
 	this.parentKey = key.Parent()
 }
 
-func (this Model) ParentKey() *datastore.Key {
+func (this Model) EntityParentKey() *datastore.Key {
 	return this.parentKey
 }
 
-func (this *Model) SetParentKey(key *datastore.Key) {
+func (this *Model) SetEntityParentKey(key *datastore.Key) {
 	this.parentKey = key
 }
 
 func (this *Model) ResourceID() string {
-	return this.Key().Encode()
+	return this.EntityKey().Encode()
 }
 
 func (this *Model) SetResourceID(id string) error {
@@ -33,7 +33,7 @@ func (this *Model) SetResourceID(id string) error {
 	if err != nil {
 		return err
 	}
-	this.SetKey(key)
-	this.SetParentKey(key.Parent())
+	this.SetEntityKey(key)
+	this.SetEntityParentKey(key.Parent())
 	return nil
 }

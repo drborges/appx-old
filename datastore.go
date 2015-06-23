@@ -19,7 +19,7 @@ func (this *Datastore) Load(p Persistable) error {
 		return err
 	}
 
-	return datastore.Get(this.context, p.Key(), p)
+	return datastore.Get(this.context, p.EntityKey(), p)
 }
 
 func (this *Datastore) LoadAll(slice interface{}) error {
@@ -35,7 +35,7 @@ func (this *Datastore) LoadAll(slice interface{}) error {
 		if err := ResolveKey(this.context, p); err != nil {
 			return err
 		}
-		keys[i] = p.Key()
+		keys[i] = p.EntityKey()
 	}
 
 	return datastore.GetMulti(this.context, keys, slice)
@@ -46,12 +46,12 @@ func (this *Datastore) Update(p Persistable) error {
 		return err
 	}
 
-	key, err := datastore.Put(this.context, p.Key(), p)
+	key, err := datastore.Put(this.context, p.EntityKey(), p)
 	if err != nil {
 		return err
 	}
 
-	p.SetKey(key)
+	p.SetEntityKey(key)
 	return nil
 }
 
@@ -66,7 +66,7 @@ func (this *Datastore) Create(p Persistable) error {
 		return err
 	}
 
-	p.SetKey(key)
+	p.SetEntityKey(key)
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (this *Datastore) CreateAll(slice interface{}) error {
 	}
 
 	for i, key := range keys {
-		s.Index(i).Interface().(Entity).SetKey(key)
+		s.Index(i).Interface().(Entity).SetEntityKey(key)
 	}
 
 	return nil
@@ -103,7 +103,7 @@ func (this *Datastore) Delete(p Persistable) error {
 		return err
 	}
 
-	return datastore.Delete(this.context, p.Key())
+	return datastore.Delete(this.context, p.EntityKey())
 }
 
 func (this *Datastore) Query(q *datastore.Query) *QueryRunner {
