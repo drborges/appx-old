@@ -3,25 +3,25 @@ package appx
 import "appengine/datastore"
 
 type Model struct {
-	key       *datastore.Key `datastore:"-"`
-	parentKey *datastore.Key `datastore:"-"`
+	Key       *datastore.Key `datastore:"-"`
+	ParentKey *datastore.Key `datastore:"-"`
 }
 
 func (this Model) EntityKey() *datastore.Key {
-	return this.key
+	return this.Key
 }
 
 func (this *Model) SetEntityKey(key *datastore.Key) {
-	this.key = key
-	this.parentKey = key.Parent()
+	this.Key = key
+	this.ParentKey = key.Parent()
 }
 
 func (this Model) EntityParentKey() *datastore.Key {
-	return this.parentKey
+	return this.ParentKey
 }
 
 func (this *Model) SetEntityParentKey(key *datastore.Key) {
-	this.parentKey = key
+	this.ParentKey = key
 }
 
 func (this *Model) ResourceID() string {

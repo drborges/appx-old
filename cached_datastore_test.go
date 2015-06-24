@@ -21,8 +21,8 @@ func TestCachedDatastore(t *testing.T) {
 				appx.ResolveKey(c, tag)
 				memcache.JSON.Set(c, &memcache.Item{
 					Key:    tag.CacheID(),
-					Object: appx.CacheableEntity{tag, tag.EntityKey()}},
-				)
+					Object: tag,
+				})
 
 				Convey("When I load it with CachedDatastore", func() {
 					tagFromCache := &Tag{Name: tag.Name}
@@ -102,11 +102,10 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And I can load a cacheable entity from the cache", func() {
-							cachableEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
-							cachableEntity.Cacheable.SetEntityKey(cachableEntity.Key)
+							tagFromCache := &Tag{Name: tag.Name}
+							memcache.JSON.Get(c, tagFromCache.CacheID(), tagFromCache)
 
-							So(cachableEntity.Cacheable, ShouldResemble, tag)
+							So(tagFromCache, ShouldResemble, tag)
 						})
 					})
 				})
@@ -118,7 +117,7 @@ func TestCachedDatastore(t *testing.T) {
 
 				memcache.JSON.Set(c, &memcache.Item{
 					Key:    tag.CacheID(),
-					Object: appx.CacheableEntity{tag, tag.EntityKey()},
+					Object: tag,
 				})
 
 				Convey("When I create the entity with CachedDatastore", func() {
@@ -129,11 +128,10 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And I the cache information is overwritten", func() {
-							cachedEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-							memcache.JSON.Get(c, tag.CacheID(), cachedEntity)
-							cachedEntity.Cacheable.SetEntityKey(cachedEntity.Key)
+							tagFromCache := &Tag{Name: tag.Name}
+							memcache.JSON.Get(c, tag.CacheID(), tagFromCache)
 
-							So(cachedEntity.Cacheable, ShouldResemble, tag)
+							So(tagFromCache, ShouldResemble, tag)
 						})
 					})
 				})
@@ -154,11 +152,10 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And cache information is updated", func() {
-							cachableEntity := &appx.CacheableEntity{Cacheable: &Tag{Name: tag.Name}}
-							memcache.JSON.Get(c, tag.CacheID(), cachableEntity)
-							cachableEntity.Cacheable.SetEntityKey(cachableEntity.Key)
+							tagFromCache := &Tag{Name: tag.Name}
+							memcache.JSON.Get(c, tag.CacheID(), tagFromCache)
 
-							So(cachableEntity.Cacheable, ShouldResemble, tag)
+							So(tagFromCache, ShouldResemble, tag)
 
 							Convey("And datastore information is updated", func() {
 								tagFromDatastore := &Tag{Name: tag.Name}
@@ -184,11 +181,10 @@ func TestCachedDatastore(t *testing.T) {
 						So(err, ShouldBeNil)
 
 						Convey("And cache information is updated", func() {
-							cachableEntity := &appx.CacheableEntity{Cacheable: &Account{Token: account.Token}}
-							memcache.JSON.Get(c, account.CacheID(), cachableEntity)
-							cachableEntity.Cacheable.SetEntityKey(cachableEntity.Key)
+							accountFromCache := &Account{Token: account.Token}
+							memcache.JSON.Get(c, account.CacheID(), accountFromCache)
 
-							So(cachableEntity.Cacheable, ShouldResemble, account)
+							So(accountFromCache, ShouldResemble, account)
 
 							Convey("And datastore information is updated", func() {
 								accountFromDatastore := &Account{Id: 12}
@@ -258,7 +254,7 @@ func TestCachedDatastore(t *testing.T) {
 				appx.NewDatastore(c).Create(account)
 
 				Convey("When I delete the entity with its key present", func() {
-					account.Token = "" // can no longer by queried on a cache miss
+					account.Token = "" // can no longer be queried on a cache miss
 					err := appx.NewCachedDatastore(c).Delete(account)
 
 					Convey("Then it successfully deletes the entity by its key", func() {
@@ -320,8 +316,8 @@ func TestCachedDatastore(t *testing.T) {
 		Convey("LoadAll", func() {
 
 			Convey("Given I have a few not cached entities in datastore", func() {
-				tag1 := &Tag{Name:"golang", Owner: "Borges"}
-				tag2 := &Tag{Name:"swift", Owner: "Borges"}
+				tag1 := &Tag{Name: "golang", Owner: "Borges"}
+				tag2 := &Tag{Name: "swift", Owner: "Borges"}
 				tags := []*Tag{tag1, tag2}
 				appx.NewDatastore(c).CreateAll(tags)
 
@@ -342,20 +338,20 @@ func TestCachedDatastore(t *testing.T) {
 			})
 
 			Convey("Given I have a few cached entities (not present in datastore)", func() {
-				tag1 := &Tag{Name:"golang", Owner: "Borges"}
-				tag2 := &Tag{Name:"swift", Owner: "Borges"}
+				tag1 := &Tag{Name: "golang", Owner: "Borges"}
+				tag2 := &Tag{Name: "swift", Owner: "Borges"}
 				tags := []*Tag{tag1, tag2}
 				appx.ResolveKey(c, tag1)
 				appx.ResolveKey(c, tag2)
 
 				memcache.JSON.Set(c, &memcache.Item{
 					Key:    tag1.CacheID(),
-					Object: appx.CacheableEntity{tag1, tag1.EntityKey()},
+					Object: tag1,
 				})
 
 				memcache.JSON.Set(c, &memcache.Item{
 					Key:    tag2.CacheID(),
-					Object: appx.CacheableEntity{tag2, tag2.EntityKey()},
+					Object: tag2,
 				})
 
 				Convey("And one not cached entity in datastore", func() {
