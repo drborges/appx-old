@@ -76,3 +76,29 @@ func (this *CachedQueryRunner) Results(slice interface{}) error {
 
 	return nil
 }
+
+func (this *CachedQueryRunner) Result(e Entity) error {
+	if this.cacheID == "" {
+		return this.runner.Result(e)
+	}
+
+	_, err := memcache.JSON.Get(this.runner.context, this.cacheID, e)
+
+	if err == memcache.ErrCacheMiss {
+		if err = this.runner.Result(e); err != nil {
+			return err
+		}
+
+		return memcache.JSON.Set(this.runner.context, &memcache.Item{
+			Key: this.cacheID,
+			Expiration: this.cacheDuration,
+			Object: e,
+		})
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
