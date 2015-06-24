@@ -177,6 +177,7 @@ func (this *CachedDatastore) Delete(cacheable Cacheable) error {
 	return nil
 }
 
-func (this *CachedDatastore) Query(q *datastore.Query) *QueryRunner {
-	return this.ds.Query(q)
+// Query provides a appx.CachedQueryRunner for the given datastore query
+func (this *CachedDatastore) Query(q *datastore.Query) *CachedQueryRunner {
+	return NewCachedQueryRunner(this.ds.context, q)
 }
