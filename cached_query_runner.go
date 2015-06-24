@@ -3,9 +3,9 @@ package appx
 import (
 	"appengine"
 	"appengine/datastore"
-	"time"
 	"appengine/memcache"
 	"strconv"
+	"time"
 )
 
 type CachedQueryRunner struct {
@@ -41,9 +41,9 @@ func (this *CachedQueryRunner) Count() (int, error) {
 		}
 
 		err = memcache.Set(this.runner.context, &memcache.Item{
-			Key: this.cacheID,
+			Key:        this.cacheID,
 			Expiration: this.cacheDuration,
-			Value: []byte(strconv.Itoa(count)),
+			Value:      []byte(strconv.Itoa(count)),
 		})
 		return count, err
 	}
@@ -64,9 +64,35 @@ func (this *CachedQueryRunner) Results(slice interface{}) error {
 		}
 
 		return memcache.JSON.Set(this.runner.context, &memcache.Item{
-			Key: this.cacheID,
+			Key:        this.cacheID,
 			Expiration: this.cacheDuration,
-			Object: slice,
+			Object:     slice,
+		})
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (this *CachedQueryRunner) Result(e Entity) error {
+	if this.cacheID == "" {
+		return this.runner.Result(e)
+	}
+
+	_, err := memcache.JSON.Get(this.runner.context, this.cacheID, e)
+
+	if err == memcache.ErrCacheMiss {
+		if err = this.runner.Result(e); err != nil {
+			return err
+		}
+
+		return memcache.JSON.Set(this.runner.context, &memcache.Item{
+			Key:        this.cacheID,
+			Expiration: this.cacheDuration,
+			Object:     e,
 		})
 	}
 
