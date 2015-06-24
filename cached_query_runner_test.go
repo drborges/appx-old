@@ -55,6 +55,43 @@ func TestCachedQueryRunner(t *testing.T) {
 						})
 					})
 				})
+
+				Convey("When I run Results it caches the results", func() {
+					runner := appx.NewCachedQueryRunner(c, q).
+						CachedAs("all tags").
+						ExpiresIn(50 * time.Second)
+
+					tagsFromDatastore := []*Tag{}
+					err := runner.Results(&tagsFromDatastore)
+
+					Convey("Then the operation succeeds", func() {
+						So(err, ShouldBeNil)
+
+						Convey("Then the entities are loaded from datastore", func() {
+							So(tagsFromDatastore, ShouldResemble, tags)
+
+							Convey("Then the result is cached with expiration time", func() {
+								tagsFromCache := []*Tag{}
+								memcache.JSON.Get(c, "all tags", &tagsFromCache)
+
+								So(tagsFromCache, ShouldResemble, tags)
+								// Seems like appengine dev server does not set the expiration
+								// time field of a cache item :~
+								//So(item.Expiration, ShouldEqual, 2*time.Second)
+								Convey("Then subsequent results will hit the cache rather than datastore", func() {
+									appx.NewDatastore(c).Delete(tag1)
+
+									subsequentTagsFromCache := []*Tag{}
+									err = runner.Results(&subsequentTagsFromCache)
+
+									So(err, ShouldBeNil)
+									So(subsequentTagsFromCache, ShouldResemble, tags)
+
+								})
+							})
+						})
+					})
+				})
 			})
 		})
 	})

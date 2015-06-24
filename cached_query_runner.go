@@ -50,3 +50,29 @@ func (this *CachedQueryRunner) Count() (int, error) {
 	count, _ := strconv.Atoi(string(item.Value))
 	return count, err
 }
+
+func (this *CachedQueryRunner) Results(slice interface{}) error {
+	if this.cacheID == "" {
+		return this.runner.Results(slice)
+	}
+
+	_, err := memcache.JSON.Get(this.runner.context, this.cacheID, slice)
+
+	if err == memcache.ErrCacheMiss {
+		if err = this.runner.Results(slice); err != nil {
+			return err
+		}
+
+		return memcache.JSON.Set(this.runner.context, &memcache.Item{
+			Key: this.cacheID,
+			Expiration: this.cacheDuration,
+			Object: slice,
+		})
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
