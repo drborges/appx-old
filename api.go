@@ -2,15 +2,11 @@ package appx
 
 import "appengine/datastore"
 
-type Resource interface {
-	Entity
-	ResourceID() string
-	SetResourceID(string) error
-}
-
 type Entity interface {
 	EntityKey() *datastore.Key
 	SetEntityKey(*datastore.Key)
+	EncodedKey() string
+	SetEncodedKey(string) error
 	EntityParentKey() *datastore.Key
 	SetEntityParentKey(*datastore.Key)
 }

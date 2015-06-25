@@ -24,11 +24,11 @@ func (this *Model) SetEntityParentKey(key *datastore.Key) {
 	this.ParentKey = key
 }
 
-func (this *Model) ResourceID() string {
+func (this *Model) EncodedKey() string {
 	return this.EntityKey().Encode()
 }
 
-func (this *Model) SetResourceID(id string) error {
+func (this *Model) SetEncodedKey(id string) error {
 	key, err := datastore.DecodeKey(id)
 	if err != nil {
 		return err
