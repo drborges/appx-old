@@ -6,18 +6,27 @@ import (
 	"appengine/memcache"
 	"encoding/json"
 	"reflect"
+	"time"
 )
 
 type CachedDatastore struct {
-	ds Datastore
+	ds        Datastore
+	rateLimit time.Duration
 }
 
 func NewCachedDatastore(c appengine.Context) *CachedDatastore {
-	return &CachedDatastore{Datastore{c}}
+	return &CachedDatastore{
+		ds: Datastore{c},
+	}
 }
 
 func (this *CachedDatastore) CounterUpdaterFor(entity Cacheable) *CounterUpdater {
 	return NewCounterUpdater(this, entity)
+}
+
+func (this *CachedDatastore) ThrottleBy(limit time.Duration) *CachedDatastore {
+	this.rateLimit = limit
+	return this
 }
 
 func (this *CachedDatastore) Load(entity Cacheable) error {
@@ -148,16 +157,34 @@ func (this *CachedDatastore) LoadAll(slice interface{}) error {
 }
 
 func (this *CachedDatastore) Update(cacheable Cacheable) error {
-	if err := this.ds.Update(cacheable); err != nil {
+	cachedItem := &memcache.Item{
+		Key:    cacheable.CacheID(),
+		Object: cacheable,
+	}
+
+	if err := memcache.JSON.Set(this.ds.context, cachedItem); err != nil {
 		return err
 	}
 
-	// Saves the cacheable as an entity with the key set
-	// to an exported field so it may also be saved
-	return memcache.JSON.Set(this.ds.context, &memcache.Item{
-		Key:    cacheable.CacheID(),
-		Object: cacheable,
-	})
+	throttledCacheID := "throttled" + cacheable.CacheID()
+	_, err := memcache.Get(this.ds.context, throttledCacheID)
+	throttled := err != memcache.ErrCacheMiss
+
+	if !throttled {
+		if err := this.ds.Update(cacheable); err != nil {
+			return err
+		}
+	}
+
+	if !throttled && this.rateLimit > 0 {
+		memcache.Set(this.ds.context, &memcache.Item{
+			Key: throttledCacheID,
+			Expiration: this.rateLimit,
+			Value: []byte(throttledCacheID),
+		})
+	}
+
+	return nil
 }
 
 func (this *CachedDatastore) Delete(cacheable Cacheable) error {

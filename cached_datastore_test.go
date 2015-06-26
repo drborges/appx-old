@@ -139,6 +139,50 @@ func TestCachedDatastore(t *testing.T) {
 		})
 
 		Convey("Update", func() {
+			Convey("Given I have a new cached entity", func() {
+				tag := &Tag{Name: "python", Owner: "Borges"}
+				cds := appx.NewCachedDatastore(c)
+				cds.Create(tag)
+
+				Convey("When I update it with a rate limit of 3 seconds", func() {
+					tag.PostCount++
+					throttledDatastore := cds.ThrottleBy(2 * time.Second)
+					throttledDatastore.Update(tag)
+					tag.PostCount++
+					throttledDatastore.Update(tag)
+					tag.PostCount++
+					throttledDatastore.Update(tag)
+
+					Convey("Then cache information is updated", func() {
+						tagFromCache := &Tag{Name: tag.Name}
+						memcache.JSON.Get(c, tag.CacheID(), tagFromCache)
+
+						So(tagFromCache.PostCount, ShouldEqual, 3)
+
+						Convey("Then only the first update is written to datastore", func() {
+							tagFromDatastore := &Tag{Name: tag.Name}
+							appx.NewDatastore(c).Load(tagFromDatastore)
+
+							So(tagFromDatastore.PostCount, ShouldEqual, 1)
+
+							Convey("Then the rate limit interval expires", func() {
+								time.Sleep(3 * time.Second)
+
+								Convey("Then new writes update cache and datastore", func() {
+									tag.PostCount++
+									throttledDatastore.Update(tag)
+
+									tagFromDatastore := &Tag{Name: tag.Name}
+									appx.NewDatastore(c).Load(tagFromDatastore)
+
+									So(tagFromDatastore.PostCount, ShouldEqual, 4)
+								})
+							})
+						})
+					})
+				})
+			})
+
 			Convey("Given I have a cached entity", func() {
 				tag := &Tag{Name: "golang", Owner: "Borges"}
 				cds := appx.NewCachedDatastore(c)
