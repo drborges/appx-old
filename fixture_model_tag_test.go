@@ -4,8 +4,9 @@ import "github.com/drborges/appx"
 
 type Tag struct {
 	appx.Model
-	Name  string
-	Owner string
+	Name      string
+	Owner     string
+	PostCount appx.Counter
 }
 
 // KeyMetadata in conjunction with appx.Model implement

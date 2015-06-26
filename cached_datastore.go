@@ -16,6 +16,10 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	return &CachedDatastore{Datastore{c}}
 }
 
+func (this *CachedDatastore) CounterUpdaterFor(entity Cacheable) *CounterUpdater {
+	return NewCounterUpdater(this, entity)
+}
+
 func (this *CachedDatastore) Load(entity Cacheable) error {
 	queryable, isQueryable := entity.(CacheMissQueryable)
 
