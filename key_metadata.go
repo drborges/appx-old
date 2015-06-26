@@ -31,7 +31,7 @@ func ResolveKey(c appengine.Context, p Persistable) error {
 		return err
 	}
 
-	if key.IntID() == 0 && key.StringID() == "" {
+	if key.Incomplete() {
 		return ErrUnresolvableKey
 	}
 
