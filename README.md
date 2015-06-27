@@ -1,3 +1,122 @@
+# appx
+
+## appx.Datastore
+
+### Create
+
+```go
+err := NewDatastore(c).Create(entity)
+```
+
+Algorithm:
+
+1. `Assigns` a new key to the entity based on its KeyMetadata() implementation regardless of whether its an incomplete key or not.
+2. Creates the entity in datastore
+
+### Load
+
+```go
+err := NewDatastore(c).Load(entity)
+```
+
+Algorithm:
+
+1. `Resolves` entity's key based on its KeyMetadata() implementation. It fails if the key is incomplete - see [datastore docs](https://cloud.google.com/appengine/docs/go/datastore/reference) for more information.
+2. Loads entity's data from datastore
+
+### Update
+
+```go
+err := NewDatastore(c).Update(entity)
+```
+
+Algorithm:
+
+1. `Resolves` the entity's key based on its KeyMetadata() implementation. It fails if the key is incomplete - see [datastore docs](https://cloud.google.com/appengine/docs/go/datastore/reference) for more information.
+2. Updates the entity in datastore
+
+### Delete
+
+```go
+err := NewDatastore(c).Delete(entity)
+```
+
+Algorithm:
+
+1. `Resolves` the entity's key based on its KeyMetadata() implementation. It fails if the key is incomplete - see [datastore docs](https://cloud.google.com/appengine/docs/go/datastore/reference) for more information.
+2. Updates the entity in datastore
+
+## Batch Operations
+
+Batch operations are limited by the same constraints limiting datastore itself, e.g. limit of `1000` reads and limit of `500` writes in a single batch.
+
+### CreateAll
+
+```go
+err := NewDatastore(c).CreateAll(entities)
+```
+
+Algorithm:
+
+1. For each entity:
+  - `Assigns` the entity's key based on its KeyMetadata() implementation.
+2. Create the entities in datastore in a single batch of up to `500` entities.
+
+### LoadAll
+
+```go
+err := NewDatastore(c).LoadAll(entities)
+```
+
+Algorithm:
+
+1. For each entity:
+  - `Resolves` the entity's key based on its KeyMetadata() implementation.
+2. Loads the entities in datastore in a single batch of up to `1000` entities.
+
+### UpdateAll
+
+```go
+err := NewDatastore(c).UpdateAll(entities)
+```
+
+Algorithm:
+
+1. For each entity:
+  - `Resolves` the entity's key based on its KeyMetadata() implementation.
+2. Updates the entities in datastore in a single batch of up to `500` entities.
+
+### DeleteAll
+
+```go
+err := NewDatastore(c).DeleteAll(entities)
+```
+
+Algorithm:
+
+1. For each entity:
+  - `Resolves` the entity's key based on its KeyMetadata() implementation.
+2. Deletes the entities in datastore in a single batch of up to `1000` entities. **Need to double check this number**
+
+## Cached datastore
+
+### Load
+
+```go
+err := NewDatastore(c).Cached(true).Load(entity)
+```
+
+Algorithm:
+
+1. Does the entity implement `appx.Cacheable`?
+  - Yes: goto to item 2
+  - No: Return an error
+2. `Resolves` the entity's key based on its KeyMetadata() implementation.
+3. Is the entity cached?
+  - Yes: load the entity's data from cache
+  - No: goto item 4
+4. Loads entity's data from datastore
+
 # Features
 
 - [X] Support to model datastore key descriptor
