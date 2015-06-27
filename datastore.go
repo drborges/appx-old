@@ -17,11 +17,22 @@ func NewDatastore(c appengine.Context) *Datastore {
 }
 
 func (this *Datastore) Load(e Entity) error {
-	if err := ResolveKey(this.context, e); err != nil {
-		return err
+	KeyResolver := func (c appengine.Context) EntityHandler {
+		return func (e Entity) error {
+			return ResolveKey(c, e)
+		}
 	}
 
-	return datastore.Get(this.context, e.EntityKey(), e)
+	DatastoreLoader := func (c appengine.Context) EntityHandler {
+		return func (e Entity) error {
+			return datastore.Get(c, e.EntityKey(), e)
+		}
+	}
+
+	return NewEntityHandlerChain(
+		KeyResolver(this.context),
+		DatastoreLoader(this.context),
+	).Handle(e)
 }
 
 func (this *Datastore) LoadAll(slice interface{}) error {
