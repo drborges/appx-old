@@ -7,11 +7,13 @@ import (
 )
 
 type Datastore struct {
-	context appengine.Context
+	context   appengine.Context
 }
 
 func NewDatastore(c appengine.Context) *Datastore {
-	return &Datastore{c}
+	return &Datastore{
+		context: c,
+	}
 }
 
 func (this *Datastore) Load(e Entity) error {
@@ -29,13 +31,9 @@ func (this *Datastore) LoadAll(slice interface{}) error {
 		return datastore.ErrInvalidEntityType
 	}
 
-	keys := make([]*datastore.Key, s.Len())
-	for i := 0; i < s.Len(); i++ {
-		p := s.Index(i).Interface().(Entity)
-		if err := ResolveKey(this.context, p); err != nil {
-			return err
-		}
-		keys[i] = p.EntityKey()
+	keys, err := ResolveAllKeys(this.context, s)
+	if err != nil {
+		return err
 	}
 
 	return datastore.GetMulti(this.context, keys, slice)

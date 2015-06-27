@@ -10,13 +10,13 @@ import (
 )
 
 type CachedDatastore struct {
-	ds        Datastore
+	ds        *Datastore
 	rateLimit time.Duration
 }
 
 func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	return &CachedDatastore{
-		ds: Datastore{c},
+		ds: NewDatastore(c),
 	}
 }
 
@@ -120,7 +120,6 @@ func (this *CachedDatastore) LoadAll(slice interface{}) error {
 	}
 
 	items, err := memcache.GetMulti(this.ds.context, cacheKeys)
-	// TODO might need to handle ErrCacheMiss
 	if err != nil {
 		return err
 	}
@@ -174,9 +173,9 @@ func (this *CachedDatastore) Update(cacheable Cacheable) error {
 
 	if !throttled && this.rateLimit > 0 {
 		memcache.Set(this.ds.context, &memcache.Item{
-			Key: throttledCacheID,
+			Key:        throttledCacheID,
 			Expiration: this.rateLimit,
-			Value: []byte(throttledCacheID),
+			Value:      []byte(throttledCacheID),
 		})
 	}
 

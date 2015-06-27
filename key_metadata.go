@@ -3,6 +3,7 @@ package appx
 import (
 	"appengine"
 	"appengine/datastore"
+	"reflect"
 )
 
 type KeyMetadata struct {
@@ -37,4 +38,17 @@ func ResolveKey(c appengine.Context, e Entity) error {
 
 	e.SetEntityKey(key)
 	return nil
+}
+
+func ResolveAllKeys(c appengine.Context, s reflect.Value) ([]*datastore.Key, error) {
+	keys := make([]*datastore.Key, s.Len())
+	for i := 0; i < s.Len(); i++ {
+		p := s.Index(i).Interface().(Entity)
+		if err := ResolveKey(c, p); err != nil {
+			return nil, err
+		}
+		keys[i] = p.EntityKey()
+	}
+
+	return keys, nil
 }
