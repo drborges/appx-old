@@ -12,21 +12,21 @@ type KeyMetadata struct {
 	HasParent bool
 }
 
-func NewKey(c appengine.Context, p Persistable) (*datastore.Key, error) {
-	metadata := p.KeyMetadata()
-	if metadata.HasParent && p.EntityParentKey() == nil {
+func NewKey(c appengine.Context, e Entity) (*datastore.Key, error) {
+	metadata := e.KeyMetadata()
+	if metadata.HasParent && e.EntityParentKey() == nil {
 		return nil, ErrMissingParentKey
 	}
 
-	return datastore.NewKey(c, metadata.Kind, metadata.StringID, metadata.IntID, p.EntityParentKey()), nil
+	return datastore.NewKey(c, metadata.Kind, metadata.StringID, metadata.IntID, e.EntityParentKey()), nil
 }
 
-func ResolveKey(c appengine.Context, p Persistable) error {
-	if p.EntityKey() != nil && !p.EntityKey().Incomplete() {
+func ResolveKey(c appengine.Context, e Entity) error {
+	if e.EntityKey() != nil && !e.EntityKey().Incomplete() {
 		return nil
 	}
 
-	key, err := NewKey(c, p)
+	key, err := NewKey(c, e)
 	if err != nil {
 		return err
 	}
@@ -35,6 +35,6 @@ func ResolveKey(c appengine.Context, p Persistable) error {
 		return ErrUnresolvableKey
 	}
 
-	p.SetEntityKey(key)
+	e.SetEntityKey(key)
 	return nil
 }

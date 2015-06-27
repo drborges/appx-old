@@ -9,15 +9,11 @@ type Entity interface {
 	SetEncodedKey(string) error
 	EntityParentKey() *datastore.Key
 	SetEntityParentKey(*datastore.Key)
-}
-
-type Persistable interface {
-	Entity
 	KeyMetadata() *KeyMetadata
 }
 
 type Cacheable interface {
-	Persistable
+	Entity
 	CacheID() string
 }
 
@@ -26,19 +22,19 @@ type CacheMissQueryable interface {
 }
 
 type Creator interface {
-	Create(Persistable) error
+	Create(Entity) error
 }
 
 type Updater interface {
-	Update(Persistable) error
+	Update(Entity) error
 }
 
 type Loader interface {
-	Load(Persistable) error
+	Load(Entity) error
 }
 
 type Deleter interface {
-	Delete(Persistable) error
+	Delete(Entity) error
 }
 
 type Datasource interface {

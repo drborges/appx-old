@@ -13,7 +13,7 @@ type Account struct {
 }
 
 // KeyMetadata in conjunction with appx.Model implements
-// appx.Persistable interface which makes an Account compatible
+// appx.Entity interface which makes an Account compatible
 // with appx.Datastore
 //
 // An Account is saved under the kind "Accounts" as defined below

@@ -7,7 +7,7 @@ type ModelMissingKind struct {
 }
 
 // KeyMetadata in conjunction with appx.Model implement
-// appx.Persistable interface making Tag compatible with
+// appx.Entity interface making Tag compatible with
 // appx.Datastore
 //
 // This particular KeyMetadata definition is invalid since

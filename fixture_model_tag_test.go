@@ -10,7 +10,7 @@ type Tag struct {
 }
 
 // KeyMetadata in conjunction with appx.Model implement
-// appx.Persistable interface making Tag compatible with
+// appx.Entity interface making Tag compatible with
 // appx.Datastore
 //
 // A tag key is defined to use its name as the StringID

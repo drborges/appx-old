@@ -8,7 +8,7 @@ type Post struct {
 }
 
 // KeyMetadata in conjunction with appx.Model implement
-// appx.Persistable interface making Tag compatible with
+// appx.Entity interface making Tag compatible with
 // appx.Datastore
 //
 // Since IntID nor StringID fields are used in the KeyMetadata

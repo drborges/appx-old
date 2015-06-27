@@ -8,7 +8,7 @@ type Comment struct {
 }
 
 // KeyMetadata in conjunction with appx.Model implements
-// appx.Persistable interface making Comment compatible
+// appx.Entity interface making Comment compatible
 // with appx.Datastore
 //
 // A Comment is saved under the kind "Comments" as defined
