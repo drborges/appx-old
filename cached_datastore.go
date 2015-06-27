@@ -20,6 +20,13 @@ func NewCachedDatastore(c appengine.Context) *CachedDatastore {
 	}
 }
 
+func NewCacheItem(cacheable Cacheable) *memcache.Item {
+	return &memcache.Item{
+		Key:    cacheable.CacheID(),
+		Object: cacheable,
+	}
+}
+
 func (this *CachedDatastore) CounterUpdaterFor(entity Cacheable) *CounterUpdater {
 	return NewCounterUpdater(this, entity)
 }
@@ -65,10 +72,7 @@ func (this *CachedDatastore) Create(cacheable Cacheable) error {
 
 	// Saves the cacheable as an entity with the key set
 	// to an exported field so it may also be saved
-	return memcache.JSON.Set(this.ds.context, &memcache.Item{
-		Key:    cacheable.CacheID(),
-		Object: cacheable,
-	})
+	return memcache.JSON.Set(this.ds.context, NewCacheItem(cacheable))
 }
 
 func (this *CachedDatastore) CreateAll(slice interface{}) error {
@@ -88,10 +92,7 @@ func (this *CachedDatastore) CreateAll(slice interface{}) error {
 	items := make([]*memcache.Item, s.Len())
 	for i := 0; i < s.Len(); i++ {
 		cacheable := s.Index(i).Interface().(Cacheable)
-		items[i] = &memcache.Item{
-			Key:    cacheable.CacheID(),
-			Object: cacheable,
-		}
+		items[i] = NewCacheItem(cacheable)
 	}
 
 	// Saves the cacheable as an entity with the key set
@@ -157,12 +158,7 @@ func (this *CachedDatastore) LoadAll(slice interface{}) error {
 }
 
 func (this *CachedDatastore) Update(cacheable Cacheable) error {
-	cachedItem := &memcache.Item{
-		Key:    cacheable.CacheID(),
-		Object: cacheable,
-	}
-
-	if err := memcache.JSON.Set(this.ds.context, cachedItem); err != nil {
+	if err := memcache.JSON.Set(this.ds.context, NewCacheItem(cacheable)); err != nil {
 		return err
 	}
 
