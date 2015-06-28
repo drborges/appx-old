@@ -15,6 +15,10 @@ type KeyMetadata struct {
 
 func NewKey(c appengine.Context, e Entity) (*datastore.Key, error) {
 	metadata := e.KeyMetadata()
+	if metadata.Kind == "" {
+		return nil, ErrMissingKind
+	}
+
 	if metadata.HasParent && e.EntityParentKey() == nil {
 		return nil, ErrMissingParentKey
 	}

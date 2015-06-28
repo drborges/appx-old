@@ -35,6 +35,13 @@ func TestKeyMetadata(t *testing.T) {
 				So(err, ShouldBeNil)
 				So(key.Parent(), ShouldResemble, parentKey)
 			})
+
+			Convey("returns ErrMissingKind if kind information is missing", func() {
+				key, err := appx.NewKey(c, &ModelMissingKind{})
+
+				So(key, ShouldBeNil)
+				So(err, ShouldEqual, appx.ErrMissingKind)
+			})
 		})
 
 		Convey("ResolveKey", func() {
@@ -78,6 +85,14 @@ func TestKeyMetadata(t *testing.T) {
 				err := appx.ResolveKey(c, comment)
 
 				So(err, ShouldEqual, appx.ErrMissingParentKey)
+			})
+
+			Convey("returns ErrMissingKind if kind information is missing", func() {
+				model := &ModelMissingKind{}
+				err := appx.ResolveKey(c, model)
+
+				So(model.EntityKey(), ShouldBeNil)
+				So(err, ShouldEqual, appx.ErrMissingKind)
 			})
 		})
 	})
