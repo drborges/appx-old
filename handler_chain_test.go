@@ -8,29 +8,33 @@ import (
 )
 
 func TestEntityHandlerChain(t *testing.T) {
-	FailingHandler := func(e appx.Entity) error {
-		return errors.New("Name cannot be empty")
+	FailingHandler := func(item interface{}) (interface{}, error) {
+		e := item.(appx.Entity)
+		return e, errors.New("Name cannot be empty")
 	}
 
-	DoneHandler := func(e appx.Entity) error {
-		return appx.Done
+	DoneHandler := func(item interface{}) (interface{}, error) {
+		e := item.(appx.Entity)
+		return e, appx.Done
 	}
 
-	TagNameResolver := func(e appx.Entity) error {
+	TagNameResolver := func(item interface{}) (interface{}, error) {
+		e := item.(appx.Entity)
 		tag := e.(*Tag)
 		tag.Name = "Name Resolved"
-		return nil
+		return e, nil
 	}
 
-	TagOwnerResolver := func(e appx.Entity) error {
+	TagOwnerResolver := func(item interface{}) (interface{}, error) {
+		e := item.(appx.Entity)
 		tag := e.(*Tag)
 		tag.Owner = "Owner Resolved"
-		return nil
+		return e, nil
 	}
 
 	Convey("EntityHandlerChain", t, func() {
 		Convey("Given I have a chain with two handlers that never fails", func() {
-			chain := appx.NewEntityHandlerChain(
+			chain := appx.NewHandlerChain(
 				TagNameResolver,
 				TagOwnerResolver,
 			)
@@ -51,7 +55,7 @@ func TestEntityHandlerChain(t *testing.T) {
 		})
 
 		Convey("Given I have a chain with two handlers where the first one fails", func() {
-			chain := appx.NewEntityHandlerChain(
+			chain := appx.NewHandlerChain(
 				FailingHandler,
 				TagOwnerResolver,
 			)
@@ -71,7 +75,7 @@ func TestEntityHandlerChain(t *testing.T) {
 		})
 
 		Convey("Given I have a chain with two handlers where the first one returns appx.Done", func() {
-			chain := appx.NewEntityHandlerChain(
+			chain := appx.NewHandlerChain(
 				DoneHandler,
 				TagOwnerResolver,
 			)

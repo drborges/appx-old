@@ -47,7 +47,7 @@ func (this *CounterUpdater) update(counter *Counter, delta int64) error {
 	if this.counterKey != "" {
 		key = this.counterKey
 	}
-	updatedCount, err := memcache.Increment(this.cds.ds.context, key, delta, 0)
+	updatedCount, err := memcache.Increment(this.cds.context, key, delta, 0)
 	if err != nil {
 		return err
 	}

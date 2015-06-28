@@ -16,42 +16,42 @@ func NewDatastore(c appengine.Context) *Datastore {
 }
 
 func (this *Datastore) Create(e Entity) error {
-	return NewEntityHandlerChain().
-		With(KeyAssinger(this.context)).
+	return NewHandlerChain().
+		With(KeyAssigner(this.context)).
 		With(DatastoreUpdater(this.context)).
 		Handle(e)
 }
 
 func (this *Datastore) Load(e Entity) error {
-	return NewEntityHandlerChain().
+	return NewHandlerChain().
 		With(KeyResolver(this.context)).
 		With(DatastoreLoader(this.context)).
 		Handle(e)
 }
 
 func (this *Datastore) Update(e Entity) error {
-	return NewEntityHandlerChain().
+	return NewHandlerChain().
 		With(KeyResolver(this.context)).
 		With(DatastoreUpdater(this.context)).
 		Handle(e)
 }
 
 func (this *Datastore) Delete(e Entity) error {
-	return NewEntityHandlerChain().
+	return NewHandlerChain().
 		With(KeyResolver(this.context)).
 		With(DatastoreDeleter(this.context)).
 		Handle(e)
 }
 
 func (this *Datastore) CreateAll(slice interface{}) error {
-	return NewSliceHandlerChain().
+	return NewHandlerChain().
 		With(SliceValidator()).
 		With(DatastoreBatchCreator(this.context)).
 		Handle(slice)
 }
 
 func (this *Datastore) LoadAll(slice interface{}) error {
-	return NewSliceHandlerChain().
+	return NewHandlerChain().
 		With(SliceValidator()).
 		With(DatastoreBatchLoader(this.context)).
 		Handle(slice)
